@@ -324,7 +324,22 @@ def generate_narration(script: dict, output_dir: str) -> str:
             continue
         parts.append(narration)
 
-    full_text  = "  ...  ".join(parts)
+    # Keep real section boundaries. The Hindi neural voice responds much better
+    # to punctuation and paragraph breaks than to a literal "..." separator.
+    full_text = "\n\n".join(parts)
+
+    # Normalize common AI punctuation without changing the wording.
+    full_text = re.sub(r"\.{3,}", "…", full_text)
+    full_text = re.sub(r"[ \t]+", " ", full_text)
+    full_text = re.sub(r" *\n *", "\n", full_text).strip()
+
+    # Hindi TTS is much more natural when narration is actually Hindi text,
+    # rather than Romanized Hinglish. Warn if a generated script is mostly Latin.
+    devanagari = len(re.findall(r"[\u0900-\u097F]", full_text))
+    letters = len(re.findall(r"[A-Za-z\u0900-\u097F]", full_text))
+    if letters and devanagari / letters < 0.35:
+        print("   ⚠ Narration contains too much Roman/English text for a Hindi voice.")
+        print("      Regenerate the script so narration is written in Devanagari Hindi.\n")
 
     # Always create the narration directory automatically.
     os.makedirs(output_dir, exist_ok=True)
@@ -332,7 +347,7 @@ def generate_narration(script: dict, output_dir: str) -> str:
     audio_path = os.path.join(output_dir, "narration.mp3")
     srt_path   = os.path.join(output_dir, "narration.srt")
 
-    print(f"   → Synthesising {len(full_text.split())} words via Edge TTS…")
+    print(f"   → Synthesising {len(full_text.split())} words via Edge TTS ({config.VOICE_ID}, {config.VOICE_RATE}, {config.VOICE_PITCH})…")
     asyncio.run(_synthesise(full_text, audio_path, srt_path))
 
     # ── Post-run report ──────────────────────────────────────────────────────
