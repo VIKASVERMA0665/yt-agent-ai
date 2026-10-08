@@ -11,6 +11,74 @@ import config
 
 PEXELS_SEARCH = "https://api.pexels.com/v1/search"
 
+WIKIMEDIA_API = "https://commons.wikimedia.org/w/api.php"
+
+
+def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
+                             count: int = 1, orientation: str = "landscape",
+                             img_num_start: int = 0) -> list:
+    """Free no-key fallback using Wikimedia Commons. Saves attribution metadata."""
+    saved = []
+    params = {
+        "action": "query",
+        "generator": "search",
+        "gsrsearch": query,
+        "gsrnamespace": 6,
+        "gsrlimit": max(count * 3, 10),
+        "prop": "imageinfo",
+        "iiprop": "url|extmetadata",
+        "iiurlwidth": 1600 if orientation == "landscape" else 1000,
+        "format": "json",
+        "formatversion": "2",
+    }
+    try:
+        r = requests.get(WIKIMEDIA_API, params=params, timeout=20)
+        r.raise_for_status()
+        pages = r.json().get("query", {}).get("pages", [])
+        random.shuffle(pages)
+        credits_path = os.path.join(images_dir, "image_credits.json")
+        try:
+            with open(credits_path, "r", encoding="utf-8") as f:
+                credits = __import__("json").load(f)
+        except Exception:
+            credits = []
+
+        for page in pages:
+            if len(saved) >= count:
+                break
+            info = (page.get("imageinfo") or [{}])[0]
+            img_url = info.get("thumburl") or info.get("url")
+            if not img_url:
+                continue
+            try:
+                img_r = requests.get(img_url, timeout=30, stream=True)
+                img_r.raise_for_status()
+                fname = f"section_{section_index:02d}_img{img_num_start + len(saved) + 1:02d}.jpg"
+                path = os.path.join(images_dir, fname)
+                with open(path, "wb") as f:
+                    for chunk in img_r.iter_content(8192):
+                        f.write(chunk)
+                meta = info.get("extmetadata") or {}
+                credits.append({
+                    "file": fname,
+                    "source": page.get("title", ""),
+                    "url": page.get("canonicalurl", ""),
+                    "artist": (meta.get("Artist") or {}).get("value", ""),
+                    "license": (meta.get("LicenseShortName") or {}).get("value", ""),
+                })
+                saved.append(path)
+            except Exception as e:
+                print(f"   ⚠ Wikimedia download failed: {e}")
+
+        try:
+            with open(credits_path, "w", encoding="utf-8") as f:
+                __import__("json").dump(credits, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+    except Exception as e:
+        print(f"   ⚠ Wikimedia fallback failed for '{query}': {e}")
+    return saved
+
 FALLBACK_QUERIES = [
     "Krishna temple devotional India",
     "Mahadev Shiva temple diya India",
@@ -52,8 +120,8 @@ def _fetch_images(query: str, section_index: int, images_dir: str,
         try:
             r = requests.get(PEXELS_SEARCH, headers=headers, params=params, timeout=15)
             if r.status_code == 401:
-                print("   ⚠ Pexels API key invalid — skipping stock images")
-                return saved
+                print("   ⚠ Pexels API key unavailable — using Wikimedia Commons fallback")
+                return _fetch_wikimedia_images(search_query, section_index, images_dir, count, orientation, img_num_start)
             r.raise_for_status()
             photos = r.json().get("photos", [])
 
@@ -144,6 +212,11 @@ def download_images(script: dict, output_dir: str) -> dict:
                                     count=1, orientation=orientation,
                                     img_num_start=qi, topic_hint=topic_hint)
                 paths.extend(got)
+            if not paths:
+                # No Pexels key/results: use a free no-key Wikimedia Commons fallback.
+                for qi, q in enumerate(queries[:3]):
+                    got = _fetch_wikimedia_images(q, sid, images_dir, count=1, orientation=orientation, img_num_start=qi)
+                    paths.extend(got)
             image_map[sid] = paths if paths else None
             print(f"         saved {len(paths)} images")
 
