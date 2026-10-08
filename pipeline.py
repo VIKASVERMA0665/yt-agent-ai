@@ -32,7 +32,7 @@ def run():
     Path(config.OUTPUT_DIR).mkdir(exist_ok=True)
     Path(config.IMAGES_DIR).mkdir(exist_ok=True)
 
-    print("\n🎬  YouTube AI Agent Studio  ·  Video Pipeline\n")
+    print("\n🎬  YT Agent AI  ·  Video Pipeline\n")
 
     # ── 1. Research ───────────────────────────────────────────
     banner("1 / 6  ·  Researching trending topic  [Gemini]")
