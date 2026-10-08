@@ -37,7 +37,7 @@ CHANNEL_NAME = "Bhakti Dhun"   # shown on-screen and in upload metadata
 # ─────────────────────────────────────────
 VOICE_ID    = "hi-IN-MadhurNeural"
 VOICE_RATE  = "-8%"     # slow down slightly for narration feel
-VOICE_PITCH = "0Hz"    # slightly deeper = more cinematic
+VOICE_PITCH = "+0Hz"    # slightly deeper = more cinematic
 
 # ─────────────────────────────────────────
 #  AI Model
