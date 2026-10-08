@@ -51,7 +51,7 @@ VOICE_PITCH = "0Hz"    # slightly deeper = more cinematic
 #    gemini-2.0-flash-lite   — fastest           (1500 req/day)
 #    gemini-1.5-flash-001    — reliable fallback (1500 req/day)
 # ─────────────────────────────────────────
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "gemini-3.6-flash"
 
 # ─────────────────────────────────────────
 #  Video Dimensions
