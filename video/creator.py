@@ -293,7 +293,7 @@ def _render_hook(draw, section, t, duration):
     title = section.get("title", "")
     if t > 0.3:
         a = min(1.0, (t - 0.3) / 0.4)
-        _shadow_text(draw, (60, 50), "▶ FRACTURED TIMELINES",
+        _shadow_text(draw, (60, 50), "▶ BHAKTI DHUN",
                      _load_font("regular", 24), fill=_alpha(C["accent"], a), shadow_offset=2)
     sentences = [s.strip() for s in narr.replace("...", "…").split(".") if s.strip()]
     first_two = ". ".join(sentences[:2]) + ("." if sentences else "")
@@ -384,7 +384,7 @@ def _render_cta(draw, section, t):
     if t > 0.3:
         a = min(1.0, _ease_out((t - 0.3) / 0.5))
         font_s = _load_font("bold", 100)
-        txt  = "SUBSCRIBE"
+        txt  = "SUBSCRIBE • BHAKTI DHUN"
         bbox = draw.textbbox((0, 0), txt, font=font_s)
         tw   = bbox[2] - bbox[0]
         _shadow_text(draw, ((W - tw) // 2, H // 2 - 150), txt, font_s,
@@ -392,7 +392,7 @@ def _render_cta(draw, section, t):
     if t > 1.0:
         a2 = min(1.0, _ease_out((t - 1.0) / 0.5))
         font_sub = _load_font("regular", 44)
-        sub  = "New video every week"
+        sub  = "भक्ति • ज्ञान • शांति"
         bbox = draw.textbbox((0, 0), sub, font=font_sub)
         tw   = bbox[2] - bbox[0]
         _shadow_text(draw, ((W - tw) // 2, H // 2), sub, font_sub,
@@ -400,7 +400,7 @@ def _render_cta(draw, section, t):
     if t > 1.8:
         a3 = min(1.0, _ease_out((t - 1.8) / 0.4))
         font_b = _load_font("bold", 36)
-        bell   = "🔔 Hit the notification bell"
+        bell   = "🔔 हर नई भक्ति वीडियो के लिए जुड़े रहें"
         bbox   = draw.textbbox((0, 0), bell, font=font_b)
         tw     = bbox[2] - bbox[0]
         draw.text(((W - tw) // 2, H // 2 + 90), bell, font=font_b,
@@ -735,7 +735,7 @@ def _build_shorts_clip(all_images: list, total_duration: float,
         # ── Top brand strip ───────────────────────────────────
         draw       = ImageDraw.Draw(frame)
         font_brand = _load_font("bold", 30)
-        brand      = "▶ FRACTURED TIMELINES"
+        brand      = "▶ BHAKTI DHUN"
         bbox       = draw.textbbox((0, 0), brand, font=font_brand)
         bw         = bbox[2] - bbox[0]
         draw.text(((W - bw) // 2, 50), brand, font=font_brand,
