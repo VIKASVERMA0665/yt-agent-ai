@@ -43,7 +43,12 @@ _client = None
 def _get_client() -> genai.Client:
     global _client
     if _client is None:
-        _client = genai.Client(api_key=config.GEMINI_API_KEY)
+        _client = genai.Client(
+            api_key=config.GEMINI_API_KEY,
+            http_options=types.HttpOptions(
+                retry_options=types.HttpRetryOptions(attempts=1)
+            ),
+        )
     return _client
 
 
@@ -66,10 +71,10 @@ def generate(prompt: str, starting_model: str | None = None) -> str:
         for attempt in range(3):   # up to 3 attempts per model before moving on
             try:
                 print(f"   → Using {model}…")
+                # Gemini 3.x does not accept legacy sampling configuration.
                 response = client.models.generate_content(
                     model=model,
                     contents=prompt,
-                    config=types.GenerateContentConfig(temperature=0.9),
                 )
                 return response.text.strip()
 
