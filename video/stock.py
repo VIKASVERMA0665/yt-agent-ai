@@ -7,6 +7,7 @@ Images saved to output/images/section_N_imgM.jpg
 import os
 import random
 import requests
+import time
 import config
 
 PEXELS_SEARCH = "https://api.pexels.com/v1/search"
@@ -18,6 +19,29 @@ WIKIMEDIA_HEADERS = {
     "User-Agent": "YT-Agent-AI/1.0 (Bhakti Dhun devotional video generator; contact via GitHub repository)",
     "Accept": "application/json",
 }
+WIKIMEDIA_MIN_INTERVAL = 1.5
+_last_wikimedia_request = 0.0
+
+
+def _wikimedia_get(url: str, **kwargs):
+    """Rate-limited Wikimedia request with a short 429 backoff."""
+    global _last_wikimedia_request
+    wait = WIKIMEDIA_MIN_INTERVAL - (time.monotonic() - _last_wikimedia_request)
+    if wait > 0:
+        time.sleep(wait)
+    for attempt in range(3):
+        r = requests.get(url, **kwargs)
+        _last_wikimedia_request = time.monotonic()
+        if r.status_code != 429:
+            return r
+        retry_after = r.headers.get("Retry-After")
+        try:
+            delay = min(max(float(retry_after), 2.0), 20.0)
+        except (TypeError, ValueError):
+            delay = 5.0 * (attempt + 1)
+        print(f"   ⚠ Wikimedia rate limit (429) — waiting {delay:.1f}s…")
+        time.sleep(delay)
+    return r
 
 
 def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
@@ -38,7 +62,7 @@ def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
         "formatversion": "2",
     }
     try:
-        r = requests.get(WIKIMEDIA_API, params=params, headers=WIKIMEDIA_HEADERS, timeout=20)
+        r = _wikimedia_get(WIKIMEDIA_API, params=params, headers=WIKIMEDIA_HEADERS, timeout=20)
         r.raise_for_status()
         pages = r.json().get("query", {}).get("pages", [])
         random.shuffle(pages)
@@ -57,7 +81,7 @@ def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
             if not img_url:
                 continue
             try:
-                img_r = requests.get(img_url, headers=WIKIMEDIA_HEADERS, timeout=30, stream=True)
+                img_r = _wikimedia_get(img_url, headers=WIKIMEDIA_HEADERS, timeout=30, stream=True)
                 img_r.raise_for_status()
                 fname = f"section_{section_index:02d}_img{img_num_start + len(saved) + 1:02d}.jpg"
                 path = os.path.join(images_dir, fname)
