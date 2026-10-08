@@ -1,7 +1,7 @@
 import os
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  YouTube AI Agent Studio — Configuration
+#  YT Agent AI — Configuration
 #  Copy this file as-is. Fill in your API keys below (or use env vars).
 #  All settings are documented. Change only what you need.
 # ─────────────────────────────────────────────────────────────────────────────
