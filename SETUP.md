@@ -1,6 +1,6 @@
 # 🛠️ Setup Guide
 
-Complete step-by-step instructions to get YouTube AI Agent Studio running from scratch.
+Complete step-by-step instructions to get YT Agent AI running from scratch.
 
 > **Time required:** ~10 minutes
 
@@ -20,8 +20,8 @@ Complete step-by-step instructions to get YouTube AI Agent Studio running from s
 ### 1a. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/youtube-ai-agent.git
-cd youtube-ai-agent
+git clone https://github.com/VIKASVERMA0665/yt-agent-ai.git
+cd yt-agent-ai
 ```
 
 ### 1b. Install ffmpeg
@@ -145,11 +145,12 @@ Open `config.py` and edit:
 
 ```python
 CHANNEL_DESCRIPTION = """
-Describe your channel clearly here.
-The more specific, the better the AI's topic and script quality.
-Example: "Educational science channel for curious adults, style of Veritasium."
+Hindi devotional YouTube channel focused on bhajans, mantras, aarti,
+Krishna, Mahadev, Hanuman, Shri Ram, Maa Durga, Sanatan Dharma,
+scripture stories, satsang and spiritual life lessons.
+Target audience: Hindi-speaking devotees and families.
 """
-CHANNEL_NAME = "Your Channel Name"
+CHANNEL_NAME = "Bhakti Dhun"
 ```
 
 ---
