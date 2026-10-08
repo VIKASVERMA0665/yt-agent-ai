@@ -325,6 +325,10 @@ def generate_narration(script: dict, output_dir: str) -> str:
         parts.append(narration)
 
     full_text  = "  ...  ".join(parts)
+
+    # Always create the narration directory automatically.
+    os.makedirs(output_dir, exist_ok=True)
+
     audio_path = os.path.join(output_dir, "narration.mp3")
     srt_path   = os.path.join(output_dir, "narration.srt")
 
