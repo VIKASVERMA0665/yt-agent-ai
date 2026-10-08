@@ -18,13 +18,14 @@ ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "YOUR_ELEVENLABS_KEY")  # o
 #  The more specific you are, the better the AI's topic suggestions.
 # ─────────────────────────────────────────
 CHANNEL_DESCRIPTION = """
-A mind-bending science and technology channel in the style of Vsauce, Veritasium, and Kurzgesagt.
-We focus heavily on deep, existential "What If" scenarios, the extreme future of Artificial Intelligence,
-theoretical physics, and mind-expanding thought experiments.
-Every video should explore the absolute limits of science, space, or tech, making the viewer question reality.
-Target audience: highly curious thinkers who want their minds blown by deep scientific and philosophical dives.
+A Hindi devotional YouTube channel focused on Hindu bhakti, bhajans, mantras, aarti, chalisa,
+Premanand Ji Maharaj satsang, Krishna bhakti, Mahadev bhakti, Hanuman bhakti, Maa Durga,
+Shri Ram, Vishnu and other Sanatan devotional topics.
+Create engaging Hindi/Hinglish devotional videos that are respectful, spiritual, family-friendly,
+and suitable for viewers seeking bhakti, peace, motivation and spiritual wisdom.
+Target audience: Hindi-speaking devotees and families interested in Sanatan Dharma and devotional content.
 """
-CHANNEL_NAME = "My AI Channel"   # shown on-screen and in upload metadata
+CHANNEL_NAME = "Bhakti Dhun"   # shown on-screen and in upload metadata
 
 # ─────────────────────────────────────────
 #  Voice (Edge TTS — free, no API key)
@@ -34,9 +35,9 @@ CHANNEL_NAME = "My AI Channel"   # shown on-screen and in upload metadata
 #    en-US-BrianNeural    — US, calm, documentary
 #    en-US-GuyNeural      — US, clear, neutral
 # ─────────────────────────────────────────
-VOICE_ID    = "en-US-AndrewNeural"
-VOICE_RATE  = "-5%"     # slow down slightly for narration feel
-VOICE_PITCH = "-3Hz"    # slightly deeper = more cinematic
+VOICE_ID    = "hi-IN-MadhurNeural"
+VOICE_RATE  = "-8%"     # slow down slightly for narration feel
+VOICE_PITCH = "0Hz"    # slightly deeper = more cinematic
 
 # ─────────────────────────────────────────
 #  AI Model
@@ -127,7 +128,7 @@ REVIEW_PORT = 5050
 # ─────────────────────────────────────────
 YOUTUBE_CLIENT_SECRET = "client_secret.json"   # OAuth credentials file (see SETUP.md)
 YOUTUBE_SCOPES        = ["https://www.googleapis.com/auth/youtube.upload"]
-VIDEO_CATEGORY_ID     = "27"       # 27 = Education
+VIDEO_CATEGORY_ID     = "22"       # 22 = People & Blogs
 VIDEO_PRIVACY         = "public"   # "public" | "unlisted" | "private"
 
 # ─────────────────────────────────────────
