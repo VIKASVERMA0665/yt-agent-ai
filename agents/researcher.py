@@ -25,18 +25,18 @@ _BUILTIN_BANNED = [
 
 # All available focus angles — used by researcher AND exposed to the GUI
 FOCUS_ANGLES = [
-    "Theoretical Physics & Time Travel",
-    "The Dark Forest Theory & Aliens",
-    "Existential Human Psychology & Illusions",
-    "Frightening AI Futures & Simulation Theory",
-    "Mind-bending Mathematical Paradoxes",
-    "The limits of Human Biology & Immortality",
-    "Quantum Mechanics & Alternate Realities",
-    "Cosmic scale, Black Holes, and the end of the Universe",
-    "Neuroscience & the Mystery of Consciousness",
-    "Ancient Civilisations & Lost History",
-    "Cutting-edge Biotechnology & Genetic Engineering",
-    "The Future of Space Colonisation",
+    "Krishna Bhakti, Bhagavad Gita and Shri Krishna Leela",
+    "Mahadev, Shiv Bhakti, Shiv Mahima and spiritual stories",
+    "Hanuman Bhakti, Hanuman Chalisa and inspiring Hanuman stories",
+    "Shri Ram, Ramayan and lessons from Prabhu Shri Ram",
+    "Maa Durga, Navratri, Devi Mahatmya and Shakti Bhakti",
+    "Vishnu, Narayan, Dashavatara and Sanatan spiritual stories",
+    "Bhajan, Mantra, Aarti and devotional practices",
+    "Premanand Ji Maharaj style spiritual wisdom and satsang topics",
+    "Sanatan Dharma stories, teachings and life lessons",
+    "Hindu festivals, vrat, puja traditions and their spiritual meaning",
+    "Devotional motivation, naam jap, meditation and inner peace",
+    "Rare and fascinating stories from Hindu scriptures and Puranas",
 ]
 
 
@@ -102,7 +102,7 @@ def research_topic(channel_description: str,
         exact_topic = topic_override.strip()
         print(f"   → Exact topic override: \"{exact_topic}\"")
 
-        prompt = f"""You are a top YouTube content strategist for a viral science/tech channel.
+        prompt = f"""You are a top YouTube content strategist for a viral Hindi devotional YouTube channel.
 
 Channel description:
 {channel_description}
@@ -123,7 +123,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no explanation:
 {{
   "topic": "{exact_topic}",
   "why_now": "Why this topic resonates with audiences right now",
-  "video_title": "MIND-BLOWING YouTube title under 70 characters about {exact_topic}",
+  "video_title": "DEVOTIONAL YouTube title under 70 characters about {exact_topic}",
   "description": "2-sentence YouTube description optimised for SEO and curiosity",
   "hook_question": "The single most mind-blowing question this video answers",
   "key_points": [
@@ -162,7 +162,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no explanation:
 
     print(f"   → Asking Gemini for topic ideas within: {chosen_angle}")
 
-    prompt = f"""You are a top YouTube content strategist for a viral science/tech channel.
+    prompt = f"""You are a top YouTube content strategist for a viral Hindi devotional YouTube channel.
 
 Channel description:
 {channel_description}
@@ -181,7 +181,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no explanation:
 {{
   "topic": "The specific video topic",
   "why_now": "Why this topic is hitting the zeitgeist right now",
-  "video_title": "MIND-BLOWING YouTube title under 70 characters",
+  "video_title": "DEVOTIONAL YouTube title under 70 characters",
   "description": "2-sentence YouTube description optimised for SEO and curiosity",
   "hook_question": "The single most mind-blowing question this video answers",
   "key_points": [
