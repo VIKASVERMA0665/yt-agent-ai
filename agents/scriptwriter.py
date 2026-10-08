@@ -17,7 +17,7 @@ def write_script(research: dict, video_type: str = "normal") -> dict:
 
     key_points_str = "\n".join(f"  {i+1}. {p}" for i, p in enumerate(research["key_points"]))
 
-    prompt = f"""You are the lead scriptwriter for a viral science YouTube channel (think Kurzgesagt, Veritasium, Vsauce).
+    prompt = f"""You are the lead scriptwriter for a viral Hindi devotional YouTube channel. Write in natural, emotionally engaging Hindi/Hinglish suitable for voice narration.
 
 Video topic: {research["topic"]}
 Title: {research["video_title"]}
@@ -25,17 +25,14 @@ Core hook question: {research.get("hook_question", "")}
 Key points to cover:
 {key_points_str}
 
-Write a GRIPPING, cinematic 6-8 minute script. Non-negotiable rules:
+Write a GRIPPING, cinematic 6-8 minute Hindi devotional script. Non-negotiable rules:
 
-PACING RULES (survival against the YouTube 2-minute drop):
-- Section 4 MUST open with a pattern-break re-hook: "But here's where it gets REALLY weird…"
-  or "Wait — everything I just told you is only HALF the story." This re-hooks viewers at ~90s.
-- Section 6 MUST open with a second re-hook: a sudden gear-shift ("So why does any of this matter?
-  Let me show you something that will change how you see the world.") This catches the 3-min drop.
-- Use OPEN LOOPS: pose a specific question in section 2 or 3 ("You might wonder: X.") and answer
-  it in section 5 or 6 — this forces viewers to stay for the payoff.
-- Vary sentence length: punchy 4-word sentences followed by longer ones. Never three long sentences in a row.
-- Use "But wait.", "Here's the thing.", "Stay with me." to reset attention.
+PACING RULES (keep devotional viewers engaged):
+- - Section 4 MUST open with a devotional re-hook such as "Lekin yahan kahani ek aisa mod leti hai..." or "Rukiye, asli rahasya to ab shuru hota hai..."
+- Section 6 MUST connect the spiritual teaching to everyday life with a fresh re-hook.
+- Use OPEN LOOPS: raise a meaningful spiritual question early and answer it later.
+- Vary sentence length and keep narration natural for Hindi voice synthesis.
+- Use respectful devotional language. Do not present unverifiable miracles as established fact; frame them as traditional beliefs or scripture-based stories.
 
 VISUAL RULES:
 - Each section needs 3 distinct image queries (image_query, image_query_2, image_query_3).
@@ -125,7 +122,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "id": 7,
       "section_type": "content",
       "title": "On-screen title — a philosophical or existential angle",
-      "narration": "The existential dimension. Make the viewer feel the scale of what this means. What question does this leave unanswered? What do the smartest experts disagree on? 4-6 sentences. End with a rhetorical question that leads into the conclusion.",
+      "narration": "The spiritual dimension. Connect the teaching to a real human struggle, devotion, karma, dharma or inner peace. 4-6 sentences. End with a thoughtful devotional question that leads into the conclusion.",
       "image_query": "cosmos or infinite space — awe-inspiring wide",
       "image_query_2": "lone human figure against vast landscape or sky",
       "image_query_3": "philosophical or abstract concept — light or shadow",
@@ -149,7 +146,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "id": 9,
       "section_type": "cta",
       "title": "On-screen title — e.g. 'Join the Journey'",
-      "narration": "We drop a new mind-bending video every week. If this changed how you see the world, subscribe — and hit the bell so you never miss one. Drop your answer in the comments: [specific question from the video]. I read every single one.",
+      "narration": "Aaj ki bhakti aur seekh agar aapke dil ko chhoo gayi ho, to channel ko subscribe karein aur comment mein likhein ki aap kis devta ya mantra se sabse zyada jude hue hain. Jai Shri Ram, Har Har Mahadev, Radhe Radhe.",
       "image_query": "space stars infinite universe night sky",
       "image_query_2": "community or crowd united by curiosity",
       "image_query_3": "cosmic overview shot — earth from space",
@@ -166,7 +163,7 @@ IMPORTANT:
 - Narration for sections 4 and 6 MUST start with the mandatory re-hook lines as described.
 - The open-loop question from section 2 MUST be answered in section 5.
 - Every narration field must contain COMPLETE, broadcast-ready sentences — no placeholders.
-- The entire script must feel like Kurzgesagt wrote it: cinematic, urgent, human."""
+- The entire script must feel cinematic, devotional, emotional, respectful, human and broadcast-ready in Hindi/Hinglish. Do not imitate or claim to be written by any specific creator."""
 
     print("   → Writing script with Gemini...")
     raw = generate(prompt)
@@ -191,7 +188,7 @@ def _write_shorts_script(research: dict) -> dict:
     """
     key_points_str = "\n".join(f"  {i+1}. {p}" for i, p in enumerate(research["key_points"][:3]))
 
-    prompt = f"""You are a viral YouTube Shorts scriptwriter. You write punchy, addictive 50-60 second vertical videos.
+    prompt = f"""You are a viral Hindi devotional YouTube Shorts scriptwriter. You write punchy, emotional, respectful 50-60 second vertical devotional videos.
 
 Video topic: {research["topic"]}
 Title: {research["video_title"]}
@@ -199,11 +196,11 @@ Hook question: {research.get("hook_question", "")}
 Key points:
 {key_points_str}
 
-Write a GRIPPING 50-60 second Shorts script. Rules:
+Write a GRIPPING 50-60 second Hindi/Hinglish devotional Shorts script. Rules:
 - Hooks in the FIRST 3 words — no slow intros
 - Short, punchy sentences. Every second counts.
 - Vertical video style: one idea per second
-- End with a cliffhanger or question that forces them to follow/subscribe
+- End with a devotional thought, question or emotional takeaway that encourages follow/subscribe
 - 3 sections ONLY: hook (10-12s), revelation (30-35s), cta (8-10s)
 - Total narration must be 120-160 words maximum
 - NEVER name the section in the title field — title is INTERNAL only, not shown on screen
