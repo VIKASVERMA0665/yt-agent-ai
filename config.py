@@ -89,9 +89,9 @@ OVERLAY_OPACITY = 0.62
 COLORS = {
     "background": (10,  10,  20),
     "overlay":    (0,   0,   0),
-    "primary":    (99,  102, 241),   # indigo
-    "accent":     (167, 139, 250),   # purple
-    "highlight":  (251, 191,  36),   # amber
+    "primary":    (245, 158, 11),    # saffron
+    "accent":     (180, 83, 9),      # deep saffron
+    "highlight":  (251, 191, 36),   # golden
     "white":      (255, 255, 255),
     "light":      (199, 210, 254),   # indigo-200
     "success":    (52,  211, 153),
