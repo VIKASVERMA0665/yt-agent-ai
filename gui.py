@@ -1,5 +1,5 @@
 """
-YouTube AI Agent — Desktop GUI
+YT Agent AI — Desktop GUI
 Run:  python gui.py
 Open: http://localhost:7070
 
