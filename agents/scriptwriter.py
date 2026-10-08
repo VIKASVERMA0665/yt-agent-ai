@@ -37,7 +37,7 @@ PACING RULES (keep devotional viewers engaged):
 VISUAL RULES:
 - Each section needs 3 distinct image queries (image_query, image_query_2, image_query_3).
   These are used for B-roll cuts every 8-12 seconds within the section. Make them visually different:
-  wide shot → close-up → abstract or concept art. NOT three variations of the same thing.
+  wide devotional establishing shot → sacred-detail close-up → symbolic spiritual visual. NOT three variations of the same thing.
 
 Respond with ONLY a valid JSON object. No markdown fences, no extra text:
 
@@ -53,7 +53,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "narration": "Open with an impossible statement or visceral question that stops the scroll. 3-4 sentences. End on an open question that section 2 will tease but section 5 will answer.",
       "image_query": "dramatic wide establishing shot matching the topic",
       "image_query_2": "close-up detail or human reaction shot",
-      "image_query_3": "abstract or cosmic concept matching the mood",
+      "image_query_3": "symbolic spiritual visual matching the devotional mood",
       "bullet_points": [],
       "caption_text": "Short punchy caption shown on screen",
       "duration_seconds": 25
@@ -63,10 +63,10 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "section_type": "intro",
       "title": "On-screen title — NOT 'Setting the Stage'",
       "narration": "Establish context and scale. Pose the open-loop question explicitly: 'Here is the question we need to answer: [question].' Promise the viewer the answer is coming and it will change everything. 4-5 sentences.",
-      "image_query": "scale or size comparison dramatic wide shot",
-      "image_query_2": "scientists or researchers at work close-up",
-      "image_query_3": "data visualization or diagram concept",
-      "bullet_points": ["The open question we will answer", "Why the scale matters", "What most people get wrong"],
+      "image_query": "temple, pilgrimage or sacred setting dramatic wide shot",
+      "image_query_2": "devotee, sadhu or spiritual teacher close-up",
+      "image_query_3": "scripture, temple architecture or spiritual-symbol concept",
+      "bullet_points": ["The spiritual question we will answer", "Why this teaching matters", "What people often misunderstand"],
       "caption_text": "What we'll explore today",
       "duration_seconds": 40
     }},
@@ -100,8 +100,8 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "title": "On-screen title — NOT 'Going Deeper'",
       "narration": "The deeper layer. MANDATORY: answer the open-loop question posed in section 2 here. 'Remember the question I asked earlier? Here is the answer — and it's stranger than you imagined.' Then the implications. 5-7 sentences.",
       "image_query": "the answer or resolution concept — dramatic and clear",
-      "image_query_2": "scientific or mathematical concept close-up",
-      "image_query_3": "wide cosmic or civilizational scale shot",
+      "image_query_2": "scripture verse, sacred symbol or devotional detail close-up",
+      "image_query_3": "wide temple, pilgrimage or nature-spirituality shot",
       "bullet_points": ["The answer to the open question", "Implication A", "Implication B"],
       "caption_text": "The rabbit hole goes deeper",
       "duration_seconds": 70
@@ -111,9 +111,9 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "section_type": "re_hook",
       "title": "On-screen title — a second gear-shift like 'And It Gets Worse.' or 'The Part Nobody Talks About'",
       "narration": "MANDATORY: Second re-hook at the 3-minute mark. Open with a sudden gear-shift: 'So why does any of this actually matter? Let me show you something that changes everything.' Then hit the real-world human stakes hard. 5-6 sentences.",
-      "image_query": "human civilization or society wide shot dramatic",
-      "image_query_2": "technology or infrastructure close-up",
-      "image_query_3": "individual human face or hands — personal scale",
+      "image_query": "devotees, family life or everyday Indian setting wide shot",
+      "image_query_2": "prayer, diya, mala or devotional practice close-up",
+      "image_query_3": "devotee hands in prayer or peaceful human expression",
       "bullet_points": ["Why this affects YOU personally", "The consequence most people ignore", "What happens if we do nothing"],
       "caption_text": "What this means for all of us",
       "duration_seconds": 65
@@ -123,11 +123,11 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "section_type": "content",
       "title": "On-screen title — a philosophical or existential angle",
       "narration": "The spiritual dimension. Connect the teaching to a real human struggle, devotion, karma, dharma or inner peace. 4-6 sentences. End with a thoughtful devotional question that leads into the conclusion.",
-      "image_query": "cosmos or infinite space — awe-inspiring wide",
+      "image_query": "sunrise over temple, river ghat or peaceful pilgrimage landscape",
       "image_query_2": "lone human figure against vast landscape or sky",
-      "image_query_3": "philosophical or abstract concept — light or shadow",
+      "image_query_3": "diya flame, meditation or symbolic spiritual light-and-shadow visual",
       "bullet_points": ["The big unanswered question", "What experts disagree on"],
-      "caption_text": "The question that keeps scientists up at night",
+      "caption_text": "The question that stays in every devotee's heart",
       "duration_seconds": 60
     }},
     {{
@@ -136,10 +136,10 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "title": "On-screen title — a satisfying payoff title",
       "narration": "Bring it home. Three punchy takeaways. Callback to the opening hook ('Remember how I asked…? Now you know.'). End with a direct question for the comments — one that every viewer has a personal answer to.",
       "image_query": "hope or breakthrough — light emerging from darkness",
-      "image_query_2": "discovery or revelation — close-up of something revealed",
-      "image_query_3": "forward-looking future technology or cosmos",
+      "image_query_2": "scripture or sacred object close-up revealing meaning",
+      "image_query_3": "devotee walking toward temple sunrise or hopeful spiritual landscape",
       "bullet_points": ["Core truth #1 — punchy and memorable", "Core truth #2 — the twist payoff", "Core truth #3 — the call to think"],
-      "caption_text": "What have we learned?",
+      "caption_text": "What have we understood?",
       "duration_seconds": 50
     }},
     {{
@@ -147,11 +147,11 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "section_type": "cta",
       "title": "On-screen title — e.g. 'Join the Journey'",
       "narration": "Aaj ki bhakti aur seekh agar aapke dil ko chhoo gayi ho, to channel ko subscribe karein aur comment mein likhein ki aap kis devta ya mantra se sabse zyada jude hue hain. Jai Shri Ram, Har Har Mahadev, Radhe Radhe.",
-      "image_query": "space stars infinite universe night sky",
-      "image_query_2": "community or crowd united by curiosity",
-      "image_query_3": "cosmic overview shot — earth from space",
+      "image_query": "temple illuminated at night, diya, stars",
+      "image_query_2": "devotees gathered for satsang or aarti",
+      "image_query_3": "peaceful temple or pilgrimage landscape wide shot",
       "bullet_points": [],
-      "caption_text": "New video every week",
+      "caption_text": "Nayi bhakti aur seekh ke liye jude rahiye",
       "duration_seconds": 18
     }}
   ]
@@ -159,7 +159,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
 
 IMPORTANT:
 - image_query / image_query_2 / image_query_3 must be VISUALLY DISTINCT from each other (wide → close → abstract).
-- Use SPECIFIC Pexels search strings (e.g. "black hole accretion disk simulation" not just "space").
+- Use SPECIFIC Pexels search strings (e.g. "Krishna temple devotional India" not just "space").
 - Narration for sections 4 and 6 MUST start with the mandatory re-hook lines as described.
 - The open-loop question from section 2 MUST be answered in section 5.
 - Every narration field must contain COMPLETE, broadcast-ready sentences — no placeholders.
@@ -217,10 +217,10 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "section_type": "hook",
       "title": "hook_internal",
       "narration": "Open with a jaw-dropping 1-sentence statement. Then the question. 2-3 punchy sentences MAX. About 30-35 words.",
-      "image_query": "dramatic space cosmos universe dark",
-      "image_query_2": "explosion supernova nebula vivid",
-      "image_query_3": "earth from space satellite view",
-      "image_query_4": "black hole gravitational waves",
+      "image_query": "dramatic temple or deity devotional scene India",
+      "image_query_2": "diya flame temple aarti close up",
+      "image_query_3": "devotee praying temple sunrise",
+      "image_query_4": "sacred scripture close up devotional",
       "bullet_points": [],
       "caption_text": "",
       "duration_seconds": 12
@@ -230,10 +230,10 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "section_type": "content",
       "title": "content_internal",
       "narration": "The core mind-blowing fact, explained in 3-4 punchy sentences. No fluff. Drive home the ONE key insight. About 80-90 words.",
-      "image_query": "relevant scientific dramatic image cinematic",
-      "image_query_2": "laboratory science experiment glowing",
-      "image_query_3": "futuristic technology neon abstract",
-      "image_query_4": "human brain neuron synapse close up",
+      "image_query": "relevant devotional dramatic image cinematic",
+      "image_query_2": "temple aarti or prayer ritual glowing",
+      "image_query_3": "sacred symbol spiritual abstract light",
+      "image_query_4": "peaceful devotee meditation close up",
       "bullet_points": [],
       "caption_text": "",
       "duration_seconds": 35
@@ -242,11 +242,11 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
       "id": 3,
       "section_type": "cta",
       "title": "cta_internal",
-      "narration": "Drop one final mind-bending teaser, then tell them to follow for more facts that break their brain. 15-20 words.",
+      "narration": "Drop one final mind-bending teaser, then tell them to follow for aur aisi bhakti ki rochak kahaniyon. 15-20 words.",
       "image_query": "stars infinite cosmos night sky milky way",
-      "image_query_2": "galaxy spiral arms nebula purple",
-      "image_query_3": "universe deep field stars",
-      "image_query_4": "space telescope distant galaxies",
+      "image_query_2": "diya and temple flowers close up",
+      "image_query_3": "peaceful pilgrimage landscape sunrise",
+      "image_query_4": "scripture and mala devotional close up",
       "bullet_points": [],
       "caption_text": "",
       "duration_seconds": 10
