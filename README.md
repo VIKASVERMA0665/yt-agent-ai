@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/screenshots/banner.png" alt="YouTube AI Agent Studio" width="100%">
+<img src="docs/screenshots/banner.png" alt="YT Agent AI" width="100%">
 
-# 🎬 Ai Powered Free Automated Faceless Youtube Studio
+# 🎬 AI Powered Free Automated Faceless YouTube Studio
 
 **A fully automated, 100% free AI pipeline that researches, scripts, narrates, animates, and uploads faceless YouTube videos — from a single command.**
 
@@ -10,7 +10,7 @@
 [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://aistudio.google.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Free Tier](https://img.shields.io/badge/Cost-$0%20per%20video-brightgreen?style=flat-square)](SETUP.md)
-[![Stars](https://img.shields.io/github/stars/raunakpatil/youtube-agentic-ai-studio?style=flat-square)](https://github.com/raunakpatil/youtube-agentic-ai-studio/stargazers)
+[![Stars](https://img.shields.io/github/stars/raunakpatil/yt-agent-ai?style=flat-square)](https://github.com/raunakpatil/yt-agent-ai/stargazers)
 
 [**Quick Start**](#-quick-start) · [**Features**](#-features) · [**Pipeline**](#️-how-it-works) · [**Setup Guide**](SETUP.md) · [**FAQ**](#-faq)
 
@@ -63,8 +63,8 @@ This repo powers **[Eldritch Lore](https://www.youtube.com/@EldritchLore)** — 
 
 ```bash
 # 1. Clone
-git clone https://github.com/raunakpatil/youtube-agentic-ai-studio.git
-cd youtube-agentic-ai-studio
+git clone https://github.com/raunakpatil/yt-agent-ai.git
+cd yt-agent-ai
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -110,7 +110,7 @@ python pipeline.py  ──►  Research  ──►  Script  ──►  Narration
 ## 📁 Project Structure
 
 ```
-youtube-ai-agent/
+yt-agent-ai/
 ├── 📄 pipeline.py              ← Run this to start the full pipeline
 ├── 🖥️  gui.py                  ← Run this for the visual GUI
 ├── ⚙️  config.py               ← All settings: keys, colors, voice, video
@@ -311,4 +311,4 @@ Made with ❤️ by <a href="https://github.com/raunakpatil">@raunakpatil</a>
 
 
 
-[![Star on GitHub](https://img.shields.io/github/stars/raunakpatil/youtube-agentic-ai-studio?style=social)](https://github.com/raunakpatil/youtube-agentic-ai-studio)
+[![Star on GitHub](https://img.shields.io/github/stars/raunakpatil/yt-agent-ai?style=social)](https://github.com/raunakpatil/yt-agent-ai)
