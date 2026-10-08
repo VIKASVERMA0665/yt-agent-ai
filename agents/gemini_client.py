@@ -68,7 +68,7 @@ def generate(prompt: str, starting_model: str | None = None) -> str:
     chain  = build_chain(starting_model or getattr(config, "GEMINI_MODEL", None))
 
     for model in chain:
-        for attempt in range(3):   # up to 3 attempts per model before moving on
+        for attempt in range(2):   # max 2 application-level attempts per model
             try:
                 print(f"   → Using {model}…")
                 # Gemini 3.x does not accept legacy sampling configuration.
@@ -80,12 +80,12 @@ def generate(prompt: str, starting_model: str | None = None) -> str:
 
             except Exception as e:
                 if _should_switch_model(e):
-                    if attempt < 2:
+                    if attempt < 1:
                         wait = 15 * (attempt + 1)   # 15s then 30s
                         print(f"   ⚠ {model} error (attempt {attempt+1}/3) — waiting {wait}s…")
                         time.sleep(wait)
                     else:
-                        print(f"   ⚠ {model} failed 3 times — trying next model…")
+                        print(f"   ⚠ {model} failed 2 times — trying next model…")
                 else:
                     raise   # auth error or bug — surface immediately
 
