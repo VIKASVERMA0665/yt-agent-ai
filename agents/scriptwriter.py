@@ -195,7 +195,7 @@ def _write_shorts_script(research: dict) -> dict:
     """
     key_points_str = "\n".join(f"  {i+1}. {p}" for i, p in enumerate(research["key_points"][:3]))
 
-    prompt = f"""You are a viral Hindi devotional YouTube Shorts scriptwriter. You write punchy, emotional, respectful 50-60 second vertical devotional videos.
+    prompt = f"""You are a viral Hindi devotional YouTube Shorts scriptwriter. You write punchy, emotional, respectful 50-60 second vertical devotional videos. Narration must be natural Hindi in Devanagari script, with commas, प्रश्नचिह्न, विस्मयादिबोधक and Hindi danda (।) used naturally. Do not write Romanized Hindi.
 
 Video topic: {research["topic"]}
 Title: {research["video_title"]}
