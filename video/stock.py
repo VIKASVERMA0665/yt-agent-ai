@@ -13,6 +13,12 @@ PEXELS_SEARCH = "https://api.pexels.com/v1/search"
 
 WIKIMEDIA_API = "https://commons.wikimedia.org/w/api.php"
 
+# Wikimedia asks automated clients to identify themselves with a descriptive User-Agent.
+WIKIMEDIA_HEADERS = {
+    "User-Agent": "YT-Agent-AI/1.0 (Bhakti Dhun devotional video generator; contact via GitHub repository)",
+    "Accept": "application/json",
+}
+
 
 def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
                              count: int = 1, orientation: str = "landscape",
@@ -32,7 +38,7 @@ def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
         "formatversion": "2",
     }
     try:
-        r = requests.get(WIKIMEDIA_API, params=params, timeout=20)
+        r = requests.get(WIKIMEDIA_API, params=params, headers=WIKIMEDIA_HEADERS, timeout=20)
         r.raise_for_status()
         pages = r.json().get("query", {}).get("pages", [])
         random.shuffle(pages)
@@ -51,7 +57,7 @@ def _fetch_wikimedia_images(query: str, section_index: int, images_dir: str,
             if not img_url:
                 continue
             try:
-                img_r = requests.get(img_url, timeout=30, stream=True)
+                img_r = requests.get(img_url, headers=WIKIMEDIA_HEADERS, timeout=30, stream=True)
                 img_r.raise_for_status()
                 fname = f"section_{section_index:02d}_img{img_num_start + len(saved) + 1:02d}.jpg"
                 path = os.path.join(images_dir, fname)
