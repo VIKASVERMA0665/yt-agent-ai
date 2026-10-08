@@ -69,6 +69,9 @@ def run():
     # ── 5. Video ──────────────────────────────────────────────
     banner("5 / 6  ·  Building cinematic video  [MoviePy]")
     video_path = create_video(script, audio_path, config.OUTPUT_DIR, image_map)
+    # Use an absolute path so the Flask review server does not resolve
+    # the relative output path from inside the review/ directory.
+    video_path = os.path.abspath(video_path)
 
     # ── 6. Review ─────────────────────────────────────────────
     banner("6 / 6  ·  Human review  [Flask dashboard]")
