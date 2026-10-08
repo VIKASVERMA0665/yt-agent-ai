@@ -12,12 +12,12 @@ import config
 PEXELS_SEARCH = "https://api.pexels.com/v1/search"
 
 FALLBACK_QUERIES = [
-    "space universe stars galaxy",
-    "science technology futuristic",
-    "earth atmosphere clouds aerial",
-    "abstract light particles dark",
-    "dramatic landscape nature",
-    "neon city night lights",
+    "Krishna temple devotional India",
+    "Mahadev Shiva temple diya India",
+    "Hanuman temple aarti devotional",
+    "Hindu temple sunrise peaceful",
+    "devotee prayer meditation India",
+    "diya aarti flowers temple",
 ]
 
 
