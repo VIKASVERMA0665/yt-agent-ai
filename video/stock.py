@@ -94,7 +94,7 @@ def _make_fallback_image(path: str) -> str:
     bbox = draw.textbbox((0, 0), subtitle, font=small)
     draw.text(((w-(bbox[2]-bbox[0]))//2, 165), subtitle, font=small, fill=(245, 158, 11))
 
-    img.save(path, quality=92)
+    img.save(path)
     return path
 
 def _fetch_images(query: str, section_index: int, images_dir: str,
