@@ -11,7 +11,7 @@ Complete step-by-step instructions to get YT Agent AI running from scratch.
 - Python **3.10 or newer** — [python.org/downloads](https://www.python.org/downloads/)
 - `ffmpeg` installed and on your PATH (see [Step 1b](#1b-install-ffmpeg))
 - A Google account (for Gemini + YouTube)
-- A Pexels account (free image API)
+- A Pixabay account (free image API)
 
 ---
 
@@ -55,9 +55,9 @@ pip install -r requirements.txt
 3. Click **Create API Key**
 4. Copy the key
 
-### 2b. Pexels API Key (required — free)
+### 2b. Pixabay API Key (required — free)
 
-1. Go to [pexels.com/api](https://www.pexels.com/api/)
+1. Go to [pixabay.com/api](https://www.pixabay.com/api/)
 2. Create a free account and click **Your API Key**
 3. Copy the key
 
@@ -94,7 +94,7 @@ Open `config.py` and replace the placeholder values:
 
 ```python
 GEMINI_API_KEY = "AIza..."     # your Gemini key
-PEXELS_API_KEY = "abc123..."   # your Pexels key
+PEXELS_API_KEY = "abc123..."   # your Pixabay key
 ```
 
 ---
