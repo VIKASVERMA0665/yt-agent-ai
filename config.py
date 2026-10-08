@@ -102,11 +102,13 @@ COLORS = {
 FONT_PATHS = {
     "bold":    [
         "C:/Windows/Fonts/Impact.ttf",
+        "C:/Windows/Fonts/NirmalaB.ttf",
         "C:/Windows/Fonts/arialbd.ttf",
         "/System/Library/Fonts/Supplemental/Impact.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     ],
     "regular": [
+        "C:/Windows/Fonts/Nirmala.ttf",
         "C:/Windows/Fonts/arial.ttf",
         "C:/Windows/Fonts/segoeui.ttf",
         "/System/Library/Fonts/Helvetica.ttc",
