@@ -1,7 +1,7 @@
 """
 YT Agent AI — Desktop GUI
 Run:  python gui.py
-Open: http://localhost:7070
+Open: http://localhost:7842
 
 Replaces pipeline.py + review/app.py entirely.
 One page controls everything: generate, review, edit, upload.
@@ -211,12 +211,12 @@ def _build_description(script, research, video_type: str = "normal"):
         lines.append("")
 
     if is_shorts:
-        lines += ["👆 Follow for more mind-bending facts!",
-                  "💬 Comment: did this surprise you?", ""]
+        lines += ["👆 Follow for more bhakti aur spiritual wisdom!",
+                  "💬 Comment: Jai Shri Ram / Har Har Mahadev / Radhe Radhe", ""]
     else:
-        lines += ["─"*40, "🔔 Subscribe for a new mind-bending video every week!",
+        lines += ["─"*40, "🔔 Subscribe for a nayi bhakti aur spiritual wisdom video ke liye subscribe karein!",
                   "👍 Like if this made you think differently.",
-                  "💬 Drop a comment — we read every one.", ""]
+                  "💬 Comment mein apni bhakti ya anubhav zaroor batayein.", ""]
 
     tags = script.get("tags", [])
     if tags: lines.append(" ".join(f"#{t.replace(' ','')}" for t in tags[:8]))
