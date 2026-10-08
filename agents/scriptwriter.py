@@ -17,7 +17,9 @@ def write_script(research: dict, video_type: str = "normal") -> dict:
 
     key_points_str = "\n".join(f"  {i+1}. {p}" for i, p in enumerate(research["key_points"]))
 
-    prompt = f"""You are the lead scriptwriter for a viral Hindi devotional YouTube channel. Write in natural, emotionally engaging Hindi/Hinglish suitable for voice narration.
+    prompt = f"""You are the lead scriptwriter for a viral Hindi devotional YouTube channel. Write the narration in natural spoken Hindi using Devanagari script (हिंदी), suitable for a warm human devotional voice.
+Use English only when it is genuinely part of a proper name or unavoidable term. Do NOT write Romanized Hindi such as
+"bhakti", "aap", "kya", "kyunki" inside narration. The narration must sound like a real Hindi speaker, not a translated article.
 
 Video topic: {research["topic"]}
 Title: {research["video_title"]}
@@ -32,6 +34,10 @@ PACING RULES (keep devotional viewers engaged):
 - Section 6 MUST connect the spiritual teaching to everyday life with a fresh re-hook.
 - Use OPEN LOOPS: raise a meaningful spiritual question early and answer it later.
 - Vary sentence length and keep narration natural for Hindi voice synthesis.
+- Use short and medium sentences with natural commas and sentence endings.
+- Use proper punctuation throughout: comma (,), question mark (?), exclamation (!), and Hindi danda (।).
+- Add commas where a human speaker would naturally breathe; do not write long unpunctuated paragraphs.
+- Every narration sentence must end with appropriate punctuation.
 - Use respectful devotional language. Do not present unverifiable miracles as established fact; frame them as traditional beliefs or scripture-based stories.
 
 VISUAL RULES:
@@ -159,7 +165,8 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
 
 IMPORTANT:
 - image_query / image_query_2 / image_query_3 must be VISUALLY DISTINCT from each other (wide → close → abstract).
-- Use SPECIFIC Pexels search strings (e.g. "Krishna temple devotional India" not just "space").
+- Use SPECIFIC Pixabay-friendly English search strings, 3-7 concrete words each (e.g. "Krishna temple devotional India", "diya aarti close up", "devotee praying temple").
+- Do not use abstract instructions such as "dramatic wide establishing shot matching the topic"; name the actual subject to search for.
 - Narration for sections 4 and 6 MUST start with the mandatory re-hook lines as described.
 - The open-loop question from section 2 MUST be answered in section 5.
 - Every narration field must contain COMPLETE, broadcast-ready sentences — no placeholders.
@@ -257,7 +264,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
 IMPORTANT:
 - Total narration across ALL sections: 120-160 words maximum
 - Each section narration must be complete, broadcast-ready sentences
-- image_query and image_query_2/3/4 must all be DIFFERENT specific Pexels visual search strings
+- image_query and image_query_2/3/4 must all be DIFFERENT specific Pixabay visual search strings
 - title fields are INTERNAL labels only — they are never shown on screen"""
 
     print("   → Writing Shorts script with Gemini...")
