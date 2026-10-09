@@ -162,7 +162,7 @@ def download_images(script: dict, output_dir: str) -> dict:
                 queries.append(q)
         queries = [q for q in queries if q]
 
-        fallbacks = _GENERIC_BY_TYPE.get(stype, _GENERIC_BY_TYPE["default"])
+        fallbacks = topic_queries
         wanted = len(queries) if is_shorts else min(3, max(1, len(queries)))
 
         print(f"   → [{sid}] Pixabay: {len(queries)} queries × 1 image each")
