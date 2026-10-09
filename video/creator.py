@@ -917,7 +917,7 @@ def create_video(script: dict, audio_path: str, output_dir: str,
                 bullets = sec.get("bullet_points", []) or []
                 for i, bullet in enumerate(bullets[:6]):
                     text = ass_escape(f"{i + 1}. {str(bullet)[:90]}")
-                    y_margin = max(10, H - (200 + i * 88) - 48)
+                    y_margin = 200 + i * 88
                     events.append(
                         f"Dialogue: 1,{ass_time(section_clock + 0.8 + i * 0.15)},"
                         f"{ass_time(visible_end)},TopicBullet,,0,0,{y_margin},,{text}"
