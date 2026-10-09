@@ -615,7 +615,7 @@ def _draw_shorts_caption(frame_img: Image.Image, text: str) -> Image.Image:
     measure_draw = ImageDraw.Draw(base_rgba)
     font         = _load_font("bold", CAP_FONT_SIZE)
     max_w        = W - 80
-    lines        = _wrap_text(measure_draw, text.upper(), font, max_w)
+    lines        = _wrap_text(measure_draw, text, font, max_w)
 
     line_h  = CAP_FONT_SIZE + 12
     block_y = int(H * 0.72)     # sit in lower quarter of 9:16 frame
