@@ -8,7 +8,7 @@ Shorts  : Fast-paced 1080×1920, image slideshow (cuts every 2-3 s),
 
 Runs fully offline: MoviePy 1.0.3 + Pillow + NumPy.
 """
-import os, re, math
+import os, re, math, subprocess, shutil
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from moviepy.editor import VideoClip, AudioFileClip, concatenate_videoclips
@@ -495,8 +495,8 @@ def _make_clip(section, duration, bg_images, section_num, total_sections,
         if captions:
             global_t  = section_start_t + t
             srt_text  = _get_caption_at(captions, global_t)
-            if srt_text:
-                frame = _draw_normal_caption(frame, srt_text)
+            # SRT captions are added after rendering by FFmpeg/libass so Devanagari
+            # shaping works even when Pillow was built without RAQM.
 
         # ── Progress bar ──────────────────────────────────────────────────
         draw2 = ImageDraw.Draw(frame)
@@ -729,8 +729,7 @@ def _build_shorts_clip(all_images: list, total_duration: float,
         frame = Image.fromarray(frame_np)
 
         # ── Captions ─────────────────────────────────────────
-        cap_text = _get_caption_at(captions, t)
-        frame    = _draw_shorts_caption(frame, cap_text)
+        # SRT captions are added after rendering by FFmpeg/libass (proper Hindi shaping).
 
         # ── Top brand strip ───────────────────────────────────
         draw       = ImageDraw.Draw(frame)
@@ -897,6 +896,40 @@ def create_video(script: dict, audio_path: str, output_dir: str,
         verbose=False,
         logger=None,
     )
+
+    # Burn SRT captions with FFmpeg/libass instead of Pillow. Pillow in some Windows
+    # environments has RAQM disabled and renders Devanagari matras incorrectly.
+    srt_for_burn = os.path.join(output_dir, "narration.srt")
+    if captions and os.path.isfile(srt_for_burn):
+        try:
+            import imageio_ffmpeg
+            ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+            base_path = output_path[:-4] + ".pre_subtitles.mp4"
+            if os.path.exists(base_path):
+                os.remove(base_path)
+            os.replace(output_path, base_path)
+            srt_filter_path = os.path.abspath(srt_for_burn).replace("\\\\", "/").replace(":", r"\\:").replace("'", r"\\'")
+            cap_size = 30 if is_shorts else 24
+            vf = (f"subtitles=filename='{srt_filter_path}':"
+                  f"force_style='FontName=Nirmala UI,FontSize={cap_size},"
+                  "PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,"
+                  "BorderStyle=1,Outline=2,Shadow=1,Alignment=2,MarginV=80'")
+            print("   → Burning Hindi captions with FFmpeg/libass…")
+            result = subprocess.run(
+                [ffmpeg, "-y", "-i", base_path, "-vf", vf,
+                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "20",
+                 "-c:a", "copy", output_path],
+                capture_output=True, text=True,
+            )
+            if result.returncode != 0:
+                os.replace(base_path, output_path)
+                raise RuntimeError("FFmpeg subtitle pass failed: " + result.stderr[-1800:])
+            os.remove(base_path)
+            print("   ✓ Hindi subtitle pass complete")
+        except Exception as exc:
+            if 'base_path' in locals() and os.path.exists(base_path) and not os.path.exists(output_path):
+                os.replace(base_path, output_path)
+            raise RuntimeError(f"Hindi subtitle rendering failed: {exc}") from exc
 
     size_mb = os.path.getsize(output_path) // (1024 * 1024)
     print(f"\n   ✅ Video rendered: {output_path} ({size_mb} MB)")
