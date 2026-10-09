@@ -151,16 +151,46 @@ def download_images(script: dict, output_dir: str) -> dict:
     is_shorts = script.get("video_type") == "shorts"
     orientation = "portrait" if is_shorts else "landscape"
     image_map = {}
+    topic_text = " ".join([str(script.get("title", "")), str(script.get("topic", "")),
+                           str(script.get("description", ""))]).lower()
+    if any(word in topic_text for word in ("krishna", "radha", "कृष्ण", "राधा", "वृंदावन", "गीता")):
+        topic_queries = ["Radha Krishna", "Lord Krishna flute", "Vrindavan Krishna temple",
+                         "Krishna Bhagavad Gita", "Krishna peacock feather", "Hindu temple diya aarti"]
+    elif any(word in topic_text for word in ("mahadev", "shiva", "shiv", "महादेव", "शिव")):
+        topic_queries = ["Lord Shiva", "Shiva lingam temple", "Mahadev devotional",
+                         "Kedarnath temple", "Shiva trident", "Hindu temple diya aarti"]
+    elif any(word in topic_text for word in ("hanuman", "हनुमान", "बजरंगबली")):
+        topic_queries = ["Lord Hanuman", "Hanuman temple", "Hanuman gada",
+                         "Hanuman Chalisa", "Hindu temple diya aarti"]
+    elif any(word in topic_text for word in ("durga", "दुर्गा", "navratri", "देवी")):
+        topic_queries = ["Maa Durga goddess", "Durga temple", "Durga puja devotional",
+                         "Navratri diya aarti"]
+    else:
+        topic_queries = ["Hindu temple devotional", "Indian temple diya aarti",
+                         "Hindu devotee praying", "Bhagavad Gita scripture"]
 
+    print("   🔎 Devotional search filter enabled (Pixabay religion category).")
     for section in script.get("sections", []):
         sid = section["id"]
         stype = section.get("section_type", "default")
-        queries = [section.get("image_query", "").strip()]
-        for extra_key in ("image_query_2", "image_query_3", "image_query_4"):
-            q = section.get(extra_key, "").strip()
-            if q:
+        # Prefer concrete, deity-specific searches over generic AI visual directions.
+        section_text = " ".join([str(section.get("title", "")), str(section.get("narration", "")),
+                                 str(section.get("caption_text", ""))]).lower()
+        queries = []
+        if any(word in section_text for word in ("flute", "बांसुरी", "मुरली")) and "krishna" in " ".join(topic_queries).lower():
+            queries.append("Lord Krishna flute")
+        elif any(word in section_text for word in ("radha", "राधा", "प्रेम")) and "krishna" in " ".join(topic_queries).lower():
+            queries.append("Radha Krishna")
+        elif any(word in section_text for word in ("vrindavan", "वृंदावन")) and "krishna" in " ".join(topic_queries).lower():
+            queries.append("Vrindavan Krishna temple")
+        preferred = topic_queries[(int(sid) - 1) % len(topic_queries)]
+        if preferred not in queries:
+            queries.append(preferred)
+        for q in topic_queries:
+            if len(queries) >= 3:
+                break
+            if q not in queries:
                 queries.append(q)
-        queries = [q for q in queries if q]
 
         fallbacks = topic_queries
         wanted = len(queries) if is_shorts else min(3, max(1, len(queries)))
