@@ -101,14 +101,14 @@ COLORS = {
 # Fonts — add your own .ttf paths for best results; system falls back gracefully
 FONT_PATHS = {
     "bold":    [
+        "C:/Windows/Fonts/Nirmala.ttc",
         "C:/Windows/Fonts/Impact.ttf",
-        "C:/Windows/Fonts/NirmalaB.ttf",
         "C:/Windows/Fonts/arialbd.ttf",
         "/System/Library/Fonts/Supplemental/Impact.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
     ],
     "regular": [
-        "C:/Windows/Fonts/Nirmala.ttf",
+        "C:/Windows/Fonts/Nirmala.ttc",
         "C:/Windows/Fonts/arial.ttf",
         "C:/Windows/Fonts/segoeui.ttf",
         "/System/Library/Fonts/Helvetica.ttc",
