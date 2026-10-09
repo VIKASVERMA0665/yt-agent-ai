@@ -131,7 +131,7 @@ REVIEW_PORT = 5050
 YOUTUBE_CLIENT_SECRET = "client_secret.json"   # OAuth credentials file (see SETUP.md)
 YOUTUBE_SCOPES        = ["https://www.googleapis.com/auth/youtube.upload"]
 VIDEO_CATEGORY_ID     = "22"       # 22 = People & Blogs
-VIDEO_PRIVACY         = "public"   # "public" | "unlisted" | "private"
+VIDEO_PRIVACY         = "unlisted" # Initial test uploads stay unlisted; change to "public" after review.
 
 # ─────────────────────────────────────────
 #  Background Music
