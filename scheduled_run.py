@@ -1,9 +1,13 @@
-"""Run one scheduled Bhakti Dhun upload. Intended for Windows Task Scheduler."""
+"""Run one scheduled Bhakti Dhun upload from the repository directory."""
 import argparse
 import os
 import traceback
 from datetime import datetime
 from contextlib import redirect_stdout, redirect_stderr
+
+# Task Scheduler often starts processes in C:\\Windows\\System32.
+# Set the working directory before importing project modules or opening token/files.
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 from pipeline import run
 
