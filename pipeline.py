@@ -8,6 +8,7 @@ Run:  python pipeline.py
 import os
 import json
 import sys
+import argparse
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -28,15 +29,17 @@ def banner(text: str):
     print("─" * 62)
 
 
-def run():
+def run(topic_override: str = "", voice: str = "", no_review: bool = False):
     Path(config.OUTPUT_DIR).mkdir(exist_ok=True)
     Path(config.IMAGES_DIR).mkdir(exist_ok=True)
+    if voice:
+        config.VOICE_ID = voice
 
     print("\n🎬  YT Agent AI  ·  Video Pipeline\n")
 
     # ── 1. Research ───────────────────────────────────────────
     banner("1 / 6  ·  Researching trending topic  [Gemini]")
-    research = research_topic(config.CHANNEL_DESCRIPTION)
+    research = research_topic(config.CHANNEL_DESCRIPTION, topic_override=topic_override)
     print(f"\n  ✅  Topic : {research['topic']}")
     print(f"      Title : {research['video_title']}")
     print(f"      Hook  : {research.get('hook_question', '')[:90]}")
@@ -74,6 +77,11 @@ def run():
     video_path = os.path.abspath(video_path)
 
     # ── 6. Review ─────────────────────────────────────────────
+    if no_review:
+        print(f"\n✅ Fresh video rendered: {video_path}")
+        print("   Upload was not started. Review the MP4 before publishing.")
+        return
+
     banner("6 / 6  ·  Human review  [Flask dashboard]")
     print("\n  → Opening review dashboard in your browser…")
     review_data = {
@@ -98,4 +106,9 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description="Generate a devotional video from CMD.")
+    parser.add_argument("--topic", default="", help="Exact topic for this video")
+    parser.add_argument("--voice", default="", help="Edge TTS voice ID, e.g. hi-IN-SwaraNeural")
+    parser.add_argument("--no-review", action="store_true", help="Render and stop without review/upload")
+    args = parser.parse_args()
+    run(topic_override=args.topic, voice=args.voice, no_review=args.no_review)
