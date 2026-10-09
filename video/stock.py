@@ -28,7 +28,7 @@ def _search_pixabay(api_key: str, query: str, orientation: str, per_page: int = 
     params = {
         "key": api_key, "q": query, "image_type": "photo",
         "orientation": orientation, "per_page": min(max(per_page, 10), 30),
-        "safesearch": "true",
+        "safesearch": "true", "category": "religion",
     }
     r = requests.get(PIXABAY_SEARCH, params=params, timeout=20)
     if r.status_code == 429:
