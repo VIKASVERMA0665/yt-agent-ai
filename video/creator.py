@@ -310,47 +310,10 @@ def _render_hook(draw, section, t, duration):
 
 
 def _render_content(draw, section, t, duration, section_num):
-    title   = section.get("title", "")
-    bullets = section.get("bullet_points", [])
-    narr    = section.get("narration", "")
-    if t > 0.2:
-        a = min(1.0, _ease_out((t - 0.2) / 0.5))
-        font_title = _load_font("bold", 52)
-        bbox = draw.textbbox((0, 0), title, font=font_title)
-        tw   = bbox[2] - bbox[0]
-        px, py, pad = 70, 55, 18
-        draw.rounded_rectangle([px - pad, py - 10, px + tw + pad, py + 65],
-                                radius=10, fill=(10, 10, 30, 200))
-        draw.rectangle([px - pad, py - 10, px - pad + 5, py + 65],
-                       fill=_alpha(C["primary"], a))
-        _shadow_text(draw, (px, py), title, font_title,
-                     fill=_alpha(C["white"], a), shadow_offset=3)
-    if bullets:
-        font_b = _load_font("regular", 40)
-        for i, bullet in enumerate(bullets[:6]):
-            appear = 0.8 + i * 0.55
-            if t <= appear:
-                continue
-            ba    = min(1.0, _ease_out((t - appear) / 0.4))
-            slide = int((1 - ba) * 80)
-            bx    = 110 - slide
-            by    = 200 + i * 88
-            draw.ellipse([bx - 2, by + 4, bx + 36, by + 40],
-                         fill=_alpha(C["primary"], ba))
-            draw.text((bx + 8, by + 6), str(i + 1),
-                      font=_load_font("bold", 26), fill=_alpha(C["white"], ba))
-            _shadow_text(draw, (bx + 50, by),
-                         bullet[:70] + ("…" if len(bullet) > 70 else ""),
-                         font_b, fill=_alpha(C["light"], ba), shadow_offset=3)
-    else:
-        if t > 0.7:
-            a = min(1.0, _ease_out((t - 0.7) / 0.6))
-            font_n = _load_font("regular", 38)
-            lines  = _wrap_text(draw, narr, font_n, W - 220)
-            for i, line in enumerate(lines[:10]):
-                la = min(1.0, _ease_out(max(0.0, (t - 0.7 - i * 0.1) / 0.4)))
-                _shadow_text(draw, (110, 200 + i * 56), line, font_n,
-                             fill=_alpha(C["light"], la), shadow_offset=2)
+    # Hindi topic titles and bullet points are rendered by FFmpeg/libass after
+    # the video export. Pillow may lack RAQM on Windows and can turn matras
+    # into square/incorrect glyphs, so do not draw these strings with Pillow.
+    return
 
 
 def _render_conclusion(draw, section, t, duration):
@@ -897,39 +860,95 @@ def create_video(script: dict, audio_path: str, output_dir: str,
         logger=None,
     )
 
-    # Burn SRT captions with FFmpeg/libass instead of Pillow. Pillow in some Windows
-    # environments has RAQM disabled and renders Devanagari matras incorrectly.
+    # Render Hindi text with FFmpeg/libass. This handles both narration subtitles
+    # and section topic titles/bullets without relying on Pillow's optional RAQM.
     srt_for_burn = os.path.join(output_dir, "narration.srt")
-    if captions and os.path.isfile(srt_for_burn):
-        try:
-            import imageio_ffmpeg
-            ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
-            base_path = output_path[:-4] + ".pre_subtitles.mp4"
-            if os.path.exists(base_path):
-                os.remove(base_path)
-            os.replace(output_path, base_path)
-            srt_filter_path = os.path.abspath(srt_for_burn).replace("\\\\", "/").replace(":", r"\\:").replace("'", r"\\'")
-            cap_size = 30 if is_shorts else 24
-            vf = (f"subtitles=filename='{srt_filter_path}':"
-                  f"force_style='FontName=Nirmala UI,FontSize={cap_size},"
-                  "PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,"
-                  "BorderStyle=1,Outline=2,Shadow=1,Alignment=2,MarginV=80'")
-            print("   → Burning Hindi captions with FFmpeg/libass…")
-            result = subprocess.run(
-                [ffmpeg, "-y", "-i", base_path, "-vf", vf,
-                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "20",
-                 "-c:a", "copy", output_path],
-                capture_output=True, text=True,
-            )
-            if result.returncode != 0:
-                os.replace(base_path, output_path)
-                raise RuntimeError("FFmpeg subtitle pass failed: " + result.stderr[-1800:])
+    topics_ass = os.path.join(output_dir, "topic_overlays.ass")
+    try:
+        import imageio_ffmpeg
+        ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        base_path = output_path[:-4] + ".pre_subtitles.mp4"
+        if os.path.exists(base_path):
             os.remove(base_path)
-            print("   ✓ Hindi subtitle pass complete")
-        except Exception as exc:
-            if 'base_path' in locals() and os.path.exists(base_path) and not os.path.exists(output_path):
-                os.replace(base_path, output_path)
-            raise RuntimeError(f"Hindi subtitle rendering failed: {exc}") from exc
+        os.replace(output_path, base_path)
+
+        def ass_time(seconds):
+            cs = max(0, int(round(seconds * 100)))
+            hh, rem = divmod(cs, 360000)
+            mm, rem = divmod(rem, 6000)
+            ss, cc = divmod(rem, 100)
+            return f"{hh}:{mm:02d}:{ss:02d}.{cc:02d}"
+
+        def ass_escape(value):
+            return str(value or "").replace("\\", r"\\").replace("{", r"\{").replace("}", r"\}").replace("\n", r"\N")
+
+        # ASS canvas coordinates are scaled to the rendered video resolution.
+        header = (
+            "[Script Info]\nScriptType: v4.00+\n"
+            f"PlayResX: {W}\nPlayResY: {H}\nWrapStyle: 2\nScaledBorderAndShadow: yes\n\n"
+            "[V4+ Styles]\n"
+            "Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,"
+            "Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,"
+            "Alignment,MarginL,MarginR,MarginV,Encoding\n"
+            "Style: TopicTitle,Nirmala UI,52,&H00FFFFFF,&H000000FF,&H00101030,&HAA101020,"
+            "-1,0,0,0,100,100,0,0,3,1.5,0,7,70,70,45,1\n"
+            "Style: TopicBullet,Nirmala UI,40,&H00E6E6FF,&H000000FF,&H00101010,&H78000000,"
+            "0,0,0,0,100,100,0,0,1,2,1,7,115,90,0,1\n\n"
+            "[Events]\n"
+            "Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text\n"
+        )
+        events = []
+        section_clock = 0.0
+        sections = script.get("sections", [])
+        for sec in sections:
+            words = len(sec.get("narration", "").split())
+            duration = max(8.0, (words / 110) * 60)
+            end_clock = section_clock + duration
+            # The renderer crossfades neighbouring sections by 0.7 seconds.
+            visible_end = max(section_clock + 0.5, end_clock - 0.35)
+            section_type = sec.get("section_type", "content")
+            if section_type in ("content", "conclusion"):
+                title = ass_escape(sec.get("title", ""))
+                if title:
+                    events.append(
+                        f"Dialogue: 0,{ass_time(section_clock + 0.2)},{ass_time(visible_end)},"
+                        f"TopicTitle,,0,0,0,,{title}"
+                    )
+                bullets = sec.get("bullet_points", []) or []
+                for i, bullet in enumerate(bullets[:6]):
+                    text = ass_escape(f"{i + 1}. {str(bullet)[:90]}")
+                    y_margin = max(10, H - (200 + i * 88) - 48)
+                    events.append(
+                        f"Dialogue: 1,{ass_time(section_clock + 0.8 + i * 0.15)},"
+                        f"{ass_time(visible_end)},TopicBullet,,0,0,{y_margin},,{text}"
+                    )
+            section_clock = end_clock - (0.7 if sec is not sections[-1] else 0.0)
+
+        with open(topics_ass, "w", encoding="utf-8-sig", newline="\n") as f:
+            f.write(header + "\n".join(events) + "\n")
+
+        # Escape Windows drive colon for FFmpeg filter syntax.
+        topic_path = os.path.abspath(topics_ass).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
+        vf = f"subtitles=filename='{topic_path}'"
+        if captions and os.path.isfile(srt_for_burn):
+            srt_path = os.path.abspath(srt_for_burn).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
+            vf += f",subtitles=filename='{srt_path}':force_style='FontName=Nirmala UI,FontSize={30 if is_shorts else 24},PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=2,Shadow=1,Alignment=2,MarginV=80'"
+        print("   → Rendering Hindi topic text and captions with FFmpeg/libass…")
+        result = subprocess.run(
+            [ffmpeg, "-y", "-i", base_path, "-vf", vf,
+             "-c:v", "libx264", "-preset", "ultrafast", "-crf", "20",
+             "-c:a", "copy", output_path],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            os.replace(base_path, output_path)
+            raise RuntimeError("FFmpeg text-render pass failed: " + result.stderr[-1800:])
+        os.remove(base_path)
+        print("   ✓ Hindi topic text and captions rendered with libass")
+    except Exception as exc:
+        if 'base_path' in locals() and os.path.exists(base_path) and not os.path.exists(output_path):
+            os.replace(base_path, output_path)
+        raise RuntimeError(f"Hindi text rendering failed: {exc}") from exc
 
     size_mb = os.path.getsize(output_path) // (1024 * 1024)
     print(f"\n   ✅ Video rendered: {output_path} ({size_mb} MB)")
