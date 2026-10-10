@@ -169,7 +169,7 @@ GEMINI_MODEL = "gemini-3.6-flash"   # preferred model; see Google AI Studio for 
 
 ---
 
-## 🔑 API Keys Required (All Free)
+## 🔑 API Keys and Services
 
 | Service | Key | Free Tier | Where to get it |
 |---|---|---|---|
@@ -179,7 +179,7 @@ GEMINI_MODEL = "gemini-3.6-flash"   # preferred model; see Google AI Studio for 
 | **YouTube API** | `client_secret.json` | Free | [Google Cloud Console](https://console.cloud.google.com) |
 | **ElevenLabs** | `ELEVENLABS_API_KEY` | Optional | [elevenlabs.io](https://elevenlabs.io) |
 
-> **Total cost: $0 per video.** All required services have free tiers that comfortably cover daily video production.
+ > **Cost note:** Edge TTS is free, and Pixabay has a free API tier. Gemini access, quotas, YouTube API quotas, and any charges depend on your account/project settings; check the providers before running large daily batches.
 
 ---
 
