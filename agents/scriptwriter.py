@@ -40,10 +40,12 @@ PACING RULES (keep devotional viewers engaged):
 - Every narration sentence must end with appropriate punctuation.
 - Use respectful devotional language. Do not present unverifiable miracles as established fact; frame them as traditional beliefs or scripture-based stories.
 
-VISUAL RULES:
-- Each section needs 3 distinct image queries (image_query, image_query_2, image_query_3).
-  These are used for B-roll cuts every 8-12 seconds within the section. Make them visually different:
-  wide devotional establishing shot → sacred-detail close-up → symbolic spiritual visual. NOT three variations of the same thing.
+VISUAL RULES (STRICT):
+- Every image query MUST explicitly name the exact deity/person/festival in the video topic.
+- If the topic names Maa Shailputri, every query must say "Maa Shailputri" or "Shailputri Mata"; show her idol/form, white attire, Nandi bull, trident or lotus only when relevant.
+- Never suggest random cosmos, generic temples, unrelated gods/goddesses, generic human reactions, or abstract images that do not depict the exact topic.
+- For each section create 3 distinct but TOPIC-MATCHED searches: deity/form wide view, a specific attribute/ritual close-up, and another accurate depiction of the same deity.
+- Query strings must be concrete searchable visual subjects, not cinematic instructions or abstract metaphors.
 
 Respond with ONLY a valid JSON object. No markdown fences, no extra text:
 
@@ -264,7 +266,7 @@ Respond with ONLY a valid JSON object. No markdown fences, no extra text:
 IMPORTANT:
 - Total narration across ALL sections: 120-160 words maximum
 - Each section narration must be complete, broadcast-ready sentences
-- image_query and image_query_2/3/4 must all be DIFFERENT specific Pixabay visual search strings
+- Every image_query and image_query_2/3/4 must explicitly include the exact deity/person named by the topic; all must be specific, visual Pixabay search strings, never generic or unrelated
 - title fields are INTERNAL labels only — they are never shown on screen"""
 
     print("   → Writing Shorts script with Gemini...")
