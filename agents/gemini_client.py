@@ -2,13 +2,9 @@
 Gemini / Gemma Client — shared across all agents.
 Tries models in order starting from config.GEMINI_MODEL, then falls back
 through the rest of the chain until one works.
-Free-tier daily limits (approximate):
-  gemini-2.5-flash      → 500 req/day
-  gemini-2.0-flash      → 1,500 req/day
-  gemini-2.0-flash-lite → 1,500 req/day
-  gemma-4-31b-it        → 500 req/day
-  gemini-1.5-flash-001  → 1,500 req/day
-If ALL are exhausted, wait until midnight Pacific and try again.
+Availability, quota, and pricing depend on the Google AI Studio project.
+The active fallback chain is intentionally kept in sync with the GUI selector.
+If all models are exhausted, check the API quota page and retry later.
 """
 import time
 from google import genai
