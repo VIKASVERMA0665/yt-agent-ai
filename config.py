@@ -1,5 +1,30 @@
 import os
 
+# Load a simple project-local .env file without requiring an extra dependency.
+# Existing process environment variables always take precedence.
+def _load_project_env():
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if not os.path.isfile(env_path):
+        return
+    try:
+        with open(env_path, "r", encoding="utf-8") as env_file:
+            for raw_line in env_file:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+                if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+                    value = value[1:-1]
+                if key and key not in os.environ:
+                    os.environ[key] = value
+    except OSError as exc:
+        print(f"Warning: could not read .env file: {exc}")
+
+
+_load_project_env()
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  YT Agent AI — Configuration
 #  Copy this file as-is. Fill in your API keys below (or use env vars).
