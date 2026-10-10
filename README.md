@@ -217,12 +217,7 @@ OVERLAY_OPACITY    = 0.62  # how dark the image overlay is
 <details>
 <summary><b>Does this cost anything to run?</b></summary>
 
-No. The entire stack uses free tiers:
-- **Gemini** — 1500 req/day free on the 2.0-flash model
-- **Pixabay** — free API tier
-- **Edge TTS** — completely free, no account needed
-- **YouTube Data API** — free for uploads
-- **Video rendering** — runs locally on your machine (CPU/GPU)
+Edge TTS and local rendering do not require paid services, and Pixabay offers a free API tier. Gemini availability, quota, and pricing depend on your Google AI Studio project; YouTube uploads are subject to API quota. Check current provider limits before enabling daily automatic uploads.
 
 </details>
 
