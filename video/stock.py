@@ -140,76 +140,133 @@ def _fetch_images(query: str, section_index: int, images_dir: str,
         print(f"         ✓ Pixabay: {used_query} → {len(saved)} image(s)")
     return saved
 
+def _topic_visual_profile(script: dict) -> tuple[str, list[str]]:
+    """Return a strict subject anchor and safe fallbacks for this exact devotional topic."""
+    source = " ".join([
+        str(script.get("topic", "")), str(script.get("title", "")),
+        str(script.get("description", "")),
+        " ".join(str(s.get("title", "")) + " " + str(s.get("narration", ""))
+                 for s in script.get("sections", []))
+    ]).lower()
+
+    profiles = [
+        (("shailputri", "shailaputri", "शैलपुत्री", "शैलपुत्री माता"),
+         "Maa Shailputri", ["Maa Shailputri goddess idol", "Shailputri Mata Navdurga", "Maa Durga goddess idol"]),
+        (("brahmacharini", "ब्रह्मचारिणी"), "Maa Brahmacharini",
+         ["Maa Brahmacharini Navdurga", "Brahmacharini Mata idol", "Maa Durga goddess idol"]),
+        (("chandraghanta", "चंद्रघंटा"), "Maa Chandraghanta",
+         ["Maa Chandraghanta Navdurga", "Chandraghanta Mata idol", "Maa Durga goddess idol"]),
+        (("kushmanda", "कूष्मांडा", "कुष्मांडा"), "Maa Kushmanda",
+         ["Maa Kushmanda Navdurga", "Kushmanda Mata idol", "Maa Durga goddess idol"]),
+        (("skandamata", "स्कंदमाता", "स्कन्दमाता"), "Maa Skandamata",
+         ["Maa Skandamata Navdurga", "Skandamata Mata idol", "Maa Durga goddess idol"]),
+        (("katyayani", "कात्यायनी"), "Maa Katyayani",
+         ["Maa Katyayani Navdurga", "Katyayani Mata idol", "Maa Durga goddess idol"]),
+        (("kalaratri", "कालरात्रि", "कालरात्री"), "Maa Kalaratri",
+         ["Maa Kalaratri Navdurga", "Kalaratri Mata idol", "Maa Durga goddess idol"]),
+        (("mahagauri", "महागौरी"), "Maa Mahagauri",
+         ["Maa Mahagauri Navdurga", "Mahagauri Mata idol", "Maa Durga goddess idol"]),
+        (("siddhidatri", "सिद्धिदात्री"), "Maa Siddhidatri",
+         ["Maa Siddhidatri Navdurga", "Siddhidatri Mata idol", "Maa Durga goddess idol"]),
+        (("krishna", "radha", "कृष्ण", "राधा", "वृंदावन", "गीता"),
+         "Radha Krishna", ["Radha Krishna devotional", "Lord Krishna flute", "Vrindavan Krishna temple"]),
+        (("mahadev", "shiva", "shiv", "महादेव", "शिव"),
+         "Lord Shiva", ["Lord Shiva devotional", "Shiva lingam temple", "Kedarnath Shiva temple"]),
+        (("hanuman", "हनुमान", "बजरंगबली"),
+         "Lord Hanuman", ["Lord Hanuman idol", "Hanuman with gada", "Hanuman temple"]),
+        (("saraswati", "सरस्वती"), "Maa Saraswati",
+         ["Maa Saraswati goddess idol", "Saraswati veena", "Maa Saraswati puja"]),
+        (("lakshmi", "लक्ष्मी"), "Maa Lakshmi",
+         ["Maa Lakshmi goddess idol", "Lakshmi lotus", "Maa Lakshmi puja"]),
+        (("kali", "काली"), "Maa Kali",
+         ["Maa Kali goddess idol", "Kali Mata temple", "Maa Kali puja"]),
+        (("durga", "दुर्गा", "navratri", "नवरात्रि", "देवी", "शक्ति"),
+         "Maa Durga", ["Maa Durga goddess idol", "Durga Mata lion", "Navratri Durga puja"]),
+    ]
+    for tokens, anchor, fallbacks in profiles:
+        if any(token in source for token in tokens):
+            return anchor, fallbacks
+    return "Hindu devotional", ["Hindu deity idol devotional", "Hindu temple deity statue", "Hindu puja altar"]
+
+
+def _clean_visual_query(query: str) -> str:
+    """Remove vague cinematic wording so the search focuses on visible subjects."""
+    query = _simplify_query(str(query or ""))
+    query = re.sub(r"\\b(cosmos|stars|galaxy|shocked person|human reaction|abstract art|light breaking through darkness)\\b", " ", query, flags=re.I)
+    return re.sub(r"\\s+", " ", query).strip(" -,")
+
+
 def download_images(script: dict, output_dir: str) -> dict:
     """
-    Normal videos get up to three images per section.
-    If Pixabay has no usable result, a devotional fallback image is created.
+    Download scene-specific devotional visuals with a strict deity anchor.
+    AI-provided queries are never used alone: every search is anchored to the
+    actual topic, and fallbacks stay with the same deity/festival.
     """
     images_dir = os.path.join(output_dir, "images")
     os.makedirs(images_dir, exist_ok=True)
-
     is_shorts = script.get("video_type") == "shorts"
     orientation = "portrait" if is_shorts else "landscape"
+    anchor, safe_fallbacks = _topic_visual_profile(script)
     image_map = {}
-    topic_text = " ".join([str(script.get("title", "")), str(script.get("topic", "")),
-                           str(script.get("description", ""))]).lower()
-    if any(word in topic_text for word in ("krishna", "radha", "कृष्ण", "राधा", "वृंदावन", "गीता")):
-        topic_queries = ["Radha Krishna", "Lord Krishna flute", "Vrindavan Krishna temple",
-                         "Krishna Bhagavad Gita", "Krishna peacock feather", "Hindu temple diya aarti"]
-    elif any(word in topic_text for word in ("mahadev", "shiva", "shiv", "महादेव", "शिव")):
-        topic_queries = ["Lord Shiva", "Shiva lingam temple", "Mahadev devotional",
-                         "Kedarnath temple", "Shiva trident", "Hindu temple diya aarti"]
-    elif any(word in topic_text for word in ("hanuman", "हनुमान", "बजरंगबली")):
-        topic_queries = ["Lord Hanuman", "Hanuman temple", "Hanuman gada",
-                         "Hanuman Chalisa", "Hindu temple diya aarti"]
-    elif any(word in topic_text for word in ("durga", "दुर्गा", "navratri", "देवी")):
-        topic_queries = ["Maa Durga goddess", "Durga temple", "Durga puja devotional",
-                         "Navratri diya aarti"]
-    else:
-        topic_queries = ["Hindu temple devotional", "Indian temple diya aarti",
-                         "Hindu devotee praying", "Bhagavad Gita scripture"]
+    print(f"   🔎 Strict visual subject: {anchor} (Pixabay)")
 
-    print("   🔎 Devotional search filter enabled (Pixabay religion category).")
     for section in script.get("sections", []):
-        sid = section["id"]
-        stype = section.get("section_type", "default")
-        # Prefer concrete, deity-specific searches over generic AI visual directions.
-        section_text = " ".join([str(section.get("title", "")), str(section.get("narration", "")),
-                                 str(section.get("caption_text", ""))]).lower()
+        sid = int(section.get("id", len(image_map) + 1))
+        section_text = " ".join([
+            str(section.get("title", "")), str(section.get("narration", "")),
+            str(section.get("caption_text", ""))
+        ]).lower()
+
+        # Prefer AI's scene-specific searches, but prepend the exact deity anchor.
+        raw_queries = [
+            section.get("image_query", ""),
+            section.get("image_query_2", ""),
+            section.get("image_query_3", ""),
+            section.get("image_query_4", ""),
+        ]
         queries = []
-        if any(word in section_text for word in ("flute", "बांसुरी", "मुरली")) and "krishna" in " ".join(topic_queries).lower():
-            queries.append("Lord Krishna flute")
-        elif any(word in section_text for word in ("radha", "राधा", "प्रेम")) and "krishna" in " ".join(topic_queries).lower():
-            queries.append("Radha Krishna")
-        elif any(word in section_text for word in ("vrindavan", "वृंदावन")) and "krishna" in " ".join(topic_queries).lower():
-            queries.append("Vrindavan Krishna temple")
-        preferred = topic_queries[(int(sid) - 1) % len(topic_queries)]
-        if preferred not in queries:
-            queries.append(preferred)
-        for q in topic_queries:
-            if len(queries) >= 3:
-                break
-            if q not in queries:
+        for raw in raw_queries:
+            detail = _clean_visual_query(raw)
+            # Discard abstract/unrelated query fragments instead of showing random stock.
+            if not detail:
+                continue
+            q = f"{anchor} {detail}"
+            if q.lower() not in [x.lower() for x in queries]:
                 queries.append(q)
 
-        fallbacks = topic_queries
-        wanted = len(queries) if is_shorts else min(3, max(1, len(queries)))
+        # Topic-specific visual beats take priority for Navdurga / Shailputri.
+        if anchor == "Maa Shailputri":
+            if any(t in section_text for t in ("bail", "bull", "nandi", "नंदी", "वृषभ")):
+                queries.insert(0, "Maa Shailputri riding Nandi bull")
+            elif any(t in section_text for t in ("trishul", "त्रिशूल")):
+                queries.insert(0, "Maa Shailputri holding trident")
+            elif any(t in section_text for t in ("kamal", "lotus", "कमल")):
+                queries.insert(0, "Maa Shailputri holding lotus")
+            else:
+                queries.insert(0, "Maa Shailputri Navdurga goddess idol white clothes")
+        elif anchor.startswith("Maa ") and anchor != "Maa Durga":
+            queries.insert(0, f"{anchor} Navdurga goddess idol")
+        else:
+            queries.insert(0, f"{anchor} devotional idol")
 
-        print(f"   → [{sid}] Pixabay: {len(queries)} queries × 1 image each")
+        # Do not allow a generated query to turn into a generic unrelated fallback.
+        queries = list(dict.fromkeys(q for q in queries if q.strip()))
         paths = []
-        for qi, q in enumerate(queries[:wanted]):
+        wanted = min(4, max(2, len(queries))) if is_shorts else 3
+        for qi, query in enumerate(queries):
+            if len(paths) >= wanted:
+                break
             paths.extend(_fetch_images(
-                q, sid, images_dir, count=1, orientation=orientation,
-                img_num_start=qi, fallback_queries=fallbacks
+                query, sid, images_dir, count=1, orientation=orientation,
+                img_num_start=qi, fallback_queries=safe_fallbacks
             ))
 
         if not paths:
             fallback_path = os.path.join(images_dir, f"section_{sid:02d}_fallback.png")
             _make_fallback_image(fallback_path)
             paths = [fallback_path]
-            print("         ✓ devotional fallback image created")
+            print(f"         ⚠ No matching {anchor} stock images found; using devotional fallback graphic.")
 
         image_map[sid] = paths
-        print(f"         saved {len(paths)} image(s)")
-
+        print(f"         [{sid}] {anchor}: saved {len(paths)} topic-anchored image(s)")
     return image_map
