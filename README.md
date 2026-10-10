@@ -30,7 +30,7 @@
 | 📱 **Shorts Support** | Generates vertical 9:16 Shorts alongside the main video |
 | 🕵️ **Human Review** | Local web dashboard to watch and approve before publishing |
 | 🚀 **Auto Upload** | Publishes to YouTube with SEO tags, description, and thumbnail |
-| 🔄 **Smart Fallback** | 3-model chain auto-switches if any model hits quota |
+| 🔄 **Smart Fallback** | 2-model chain auto-switches if any model hits quota |
 | 🎵 **Background Music** | Drop MP3s in `music library/` — auto-looped to fit video length |
 
 ---
@@ -156,7 +156,7 @@ yt-agent-ai/
 The system automatically tries models in order, rotating from your **Starting Model** preference:
 
 ```
-gemini-3.6-flash  →  gemini-3.5-flash-lite  →  gemini-2.5-flash
+gemini-3.5-flash-lite  →  gemini-2.5-flash
 ```
 
 If a model hits quota (429), is overloaded (503), or is unavailable (404), it retries once and then advances to the next model — **so your pipeline never stops mid-run.**
@@ -164,7 +164,7 @@ If a model hits quota (429), is overloaded (503), or is unavailable (404), it re
 Set your preferred starting model in the GUI under **Settings → AI Model**, or in `config.py`:
 
 ```python
-GEMINI_MODEL = "gemini-3.6-flash"   # preferred model; see Google AI Studio for current quota/pricing
+GEMINI_MODEL = "gemini-3.5-flash-lite"   # preferred model; see Google AI Studio for current quota/pricing
 ```
 
 ---
