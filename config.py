@@ -7,7 +7,7 @@ import os
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ─────────────────────────────────────────
-#  API Keys  (all free-tier)
+#  API Keys (check provider quotas and current pricing)
 # ─────────────────────────────────────────
 GEMINI_API_KEY     = os.getenv("GEMINI_API_KEY",     "YOUR_GEMINI_API_KEY")
 PIXABAY_API_KEY    = os.getenv("PIXABAY_API_KEY",    "YOUR_PIXABAY_API_KEY")
@@ -41,13 +41,11 @@ VOICE_PITCH = "+0Hz"    # keep the natural neural-voice pitch
 #  Starting model for the fallback chain — the system auto-switches
 #  through all models below if quota or errors are hit.
 #  Change this in the GUI under Settings → AI Model, or here directly.
-#  Options (free tier):
-#    gemini-2.5-flash        — highest quality   (500 req/day)
-#    gemma-4-31b-it          — Gemma 4 31B       (500 req/day)
-#    gemini-2.0-flash        — recommended       (1500 req/day)  ← default
-#    gemini-2.0-flash-lite   — fastest           (1500 req/day)
-#    gemini-1.5-flash-001    — reliable fallback (1500 req/day)
-# ─────────────────────────────────────────
+#  Models supported by agents/gemini_client.py:
+#    gemini-3.6-flash       — preferred
+#    gemini-3.5-flash-lite  — lightweight fallback
+#    gemini-2.5-flash       — final fallback (access may vary by project)
+#  Check Google AI Studio for current quota and pricing.
 GEMINI_MODEL = "gemini-3.6-flash"
 
 # ─────────────────────────────────────────
