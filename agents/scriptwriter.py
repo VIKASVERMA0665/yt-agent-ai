@@ -270,18 +270,52 @@ IMPORTANT:
 - title fields are INTERNAL labels only — they are never shown on screen"""
 
     print("   → Writing Shorts script with Gemini...")
-    raw = generate(prompt)
-    raw = re.sub(r"^```(?:json)?", "", raw).strip()
-    raw = re.sub(r"```$", "", raw).strip()
+    last_error = None
+    script = None
 
-    match = re.search(r"\{[\s\S]*\}", raw)
-    if not match:
-        raise ValueError(f"Shorts scriptwriter returned no JSON.\n\nRaw:\n{raw[:600]}")
+    # Gemini may occasionally return a truncated or under-filled JSON response.
+    # Retry once with an explicit correction instead of failing the whole video.
+    for attempt in range(2):
+        retry_note = ""
+        if attempt:
+            retry_note = (
+                "\n\nCORRECTION REQUIRED: Your previous response did not contain exactly "
+                "3 valid sections. Return a complete JSON object with exactly 3 sections: "
+                "hook, content, cta. Do not add commentary or markdown."
+            )
+            print("   ⚠ Shorts script had too few sections; retrying Gemini once...")
 
-    script = json.loads(match.group())
+        raw = generate(prompt + retry_note)
+        raw = re.sub(r"^" + "`" * 3 + r"(?:json)?", "", raw).strip()
+        raw = re.sub(r"`" + "`" * 2 + r"$", "", raw).strip()
 
-    if "sections" not in script or len(script["sections"]) < 2:
-        raise ValueError("Shorts script returned too few sections.")
+        match = re.search(r"\{[\s\S]*\}", raw)
+        if not match:
+            last_error = "response contained no JSON object"
+            continue
+
+        try:
+            candidate = json.loads(match.group())
+        except json.JSONDecodeError as exc:
+            last_error = f"invalid JSON: {exc}"
+            continue
+
+        sections = candidate.get("sections")
+        if not isinstance(sections, list) or len(sections) < 3:
+            count = len(sections) if isinstance(sections, list) else 0
+            last_error = f"expected 3 sections, received {count}"
+            continue
+
+        # Keep the three-part Shorts structure consistent for downstream rendering.
+        candidate["sections"] = sections[:3]
+        script = candidate
+        break
+
+    if script is None:
+        raise ValueError(
+            "Gemini failed to return a valid 3-section Shorts script after 2 attempts "
+            f"({last_error}). Check the Gemini response/model and retry."
+        )
 
     # Tag it so the video creator knows
     script["video_type"] = "shorts"
