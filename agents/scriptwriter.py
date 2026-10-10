@@ -176,7 +176,7 @@ IMPORTANT:
 
     print("   → Writing script with Gemini...")
     raw = generate(prompt)
-    raw = re.sub(r"^" + "`" * 3 + r"(?:json)?", "", raw).strip()
+    raw = re.sub(r"^```(?:json)?", "", raw).strip()
     raw = re.sub(r"```$", "", raw).strip()
 
     match = re.search(r"\{[\s\S]*\}", raw)
@@ -286,7 +286,7 @@ IMPORTANT:
             print("   ⚠ Shorts script had too few sections; retrying Gemini once...")
 
         raw = generate(prompt + retry_note)
-    raw = re.sub(r"^" + "`" * 3 + r"(?:json)?", "", raw).strip()
+        raw = re.sub(r"^" + "`" * 3 + r"(?:json)?", "", raw).strip()
         raw = re.sub(r"`" + "`" * 2 + r"$", "", raw).strip()
 
         match = re.search(r"\{[\s\S]*\}", raw)
