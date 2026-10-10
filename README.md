@@ -156,19 +156,15 @@ yt-agent-ai/
 The system automatically tries models in order, rotating from your **Starting Model** preference:
 
 ```
-gemini-2.5-flash  →  gemini-2.5-flash-lite  →  gemma-4-31b-it
-       ↓
-gemini-2.0-flash  →  gemini-2.0-flash-lite  →  gemma-3-27b-it
-       ↓
-gemini-1.5-flash-001  →  gemini-1.5-pro-001
+gemini-3.6-flash  →  gemini-3.5-flash-lite  →  gemini-2.5-flash
 ```
 
-If a model hits quota (429) or is overloaded (503), it automatically retries up to 3 times then advances to the next model — **so your pipeline never stops mid-run.**
+If a model hits quota (429), is overloaded (503), or is unavailable (404), it retries once and then advances to the next model — **so your pipeline never stops mid-run.**
 
 Set your preferred starting model in the GUI under **Settings → AI Model**, or in `config.py`:
 
 ```python
-GEMINI_MODEL = "gemini-2.0-flash"   # 1500 free req/day — recommended default
+GEMINI_MODEL = "gemini-3.6-flash"   # preferred model; see Google AI Studio for current quota/pricing
 ```
 
 ---
