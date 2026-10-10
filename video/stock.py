@@ -192,8 +192,8 @@ def _topic_visual_profile(script: dict) -> tuple[str, list[str]]:
 def _clean_visual_query(query: str) -> str:
     """Remove vague cinematic wording so the search focuses on visible subjects."""
     query = _simplify_query(str(query or ""))
-    query = re.sub(r"\\b(cosmos|stars|galaxy|shocked person|human reaction|abstract art|light breaking through darkness)\\b", " ", query, flags=re.I)
-    return re.sub(r"\\s+", " ", query).strip(" -,")
+    query = re.sub(r"\b(cosmos|stars|galaxy|shocked person|human reaction|abstract art|light breaking through darkness)\b", " ", query, flags=re.I)
+    return re.sub(r"\s+", " ", query).strip(" -,")
 
 
 def download_images(script: dict, output_dir: str) -> dict:
