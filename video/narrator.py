@@ -149,7 +149,7 @@ def _build_sentence_srt(text: str, audio_path: str, srt_path: str) -> int:
     past total_ms — the last cue is pinned to total_ms exactly.
     """
     total_ms  = _get_audio_duration_ms(audio_path)
-    sentences = [s.strip() for s in re.split(r'(?<=[.!?…])\s+', text) if s.strip()]
+    sentences = [s.strip() for s in re.split(r'(?<=[.!?…।॥])\s+', text) if s.strip()]
     all_words = [w for s in sentences for w in s.split()]
 
     if not all_words:
