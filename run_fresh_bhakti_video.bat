@@ -42,7 +42,7 @@ if errorlevel 1 (
   echo Video generation failed. Read the error above and share a screenshot.
 ) else (
   echo.
-  echo Done. Check output\final_video.mp4
+  echo Done. Open the newest output\auto_*_normal\final_video.mp4 folder.
 )
 pause
 endlocal
