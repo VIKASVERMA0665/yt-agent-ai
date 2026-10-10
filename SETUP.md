@@ -69,15 +69,15 @@ pip install -r requirements.txt
 
 ```bash
 # Mac / Linux
-export GEMINI_API_KEY="your_pixabay_api_key_here"
+export GEMINI_API_KEY="your_gemini_api_key_here"
 export PIXABAY_API_KEY="your_pixabay_api_key_here"
 
 # Windows (Command Prompt)
-set GEMINI_API_KEY=your_pixabay_api_key_here
+set GEMINI_API_KEY=your_gemini_api_key_here
 set PIXABAY_API_KEY=your_pixabay_api_key_here
 
 # Windows (PowerShell)
-$env:GEMINI_API_KEY="your_pixabay_api_key_here"
+$env:GEMINI_API_KEY="your_gemini_api_key_here"
 $env:PIXABAY_API_KEY="your_pixabay_api_key_here"
 ```
 
