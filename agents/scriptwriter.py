@@ -176,7 +176,7 @@ IMPORTANT:
 
     print("   → Writing script with Gemini...")
     raw = generate(prompt)
-    raw = re.sub(r"^```(?:json)?", "", raw).strip()
+        raw = re.sub(r"^" + "`" * 3 + r"(?:json)?", "", raw).strip()
     raw = re.sub(r"```$", "", raw).strip()
 
     match = re.search(r"\{[\s\S]*\}", raw)
@@ -279,17 +279,17 @@ IMPORTANT:
         retry_note = ""
         if attempt:
             retry_note = (
-                "\\n\\nCORRECTION REQUIRED: Your previous response did not contain exactly "
+                "\n\nCORRECTION REQUIRED: Your previous response did not contain exactly "
                 "3 valid sections. Return a complete JSON object with exactly 3 sections: "
                 "hook, content, cta. Do not add commentary or markdown."
             )
             print("   ⚠ Shorts script had too few sections; retrying Gemini once...")
 
         raw = generate(prompt + retry_note)
-        raw = re.sub(r"^\\x60\\x60\\x60(?:json)?", "", raw).strip()
-        raw = re.sub(r"\\x60\\x60\\x60$", "", raw).strip()
+        raw = re.sub(r"^" + "`" * 3 + r"(?:json)?", "", raw).strip()
+        raw = re.sub(r"`" + "`" * 2 + r"$", "", raw).strip()
 
-        match = re.search(r"\\{[\\s\\S]*\\}", raw)
+        match = re.search(r"\{[\s\S]*\}", raw)
         if not match:
             last_error = "response contained no JSON object"
             continue
