@@ -197,7 +197,7 @@ def _topic_visual_profile(script: dict) -> tuple[str, list[str]]:
          ["Maa Lakshmi goddess idol", "Lakshmi lotus", "Maa Lakshmi puja"]),
         (("kali", "काली"), "Maa Kali",
          ["Maa Kali goddess idol", "Kali Mata temple", "Maa Kali puja"]),
-        (("durga", "दुर्गा", "navratri", "नवरात्रि", "देवी", "शक्ति"),
+        (("durga", "दुर्गा", "navratri", "नवरात्रि", "देवी", "शक्ति", "jai mata di", "जय माता दी", "mata rani", "माता रानी", "sherawali", "शेरावाली", "jagdambe", "जगदम्बे"),
          "Maa Durga", ["Maa Durga goddess idol", "Durga Mata lion", "Navratri Durga puja"]),
     ]
     for tokens, anchor, fallbacks in profiles:
@@ -463,7 +463,8 @@ def download_images(script: dict, output_dir: str) -> dict:
                     chosen = None
                     chosen_check = None
                     for candidate, check in approved:
-                        digest = hashlib.sha256(open(candidate["path"], "rb").read()).hexdigest()
+                        with open(candidate["path"], "rb") as image_file:
+                            digest = hashlib.sha256(image_file.read()).hexdigest()
                         if digest not in used_digests:
                             chosen, chosen_check = candidate, check
                             used_digests.add(digest)
