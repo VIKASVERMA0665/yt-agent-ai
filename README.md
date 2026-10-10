@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://aistudio.google.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Free Tier](https://img.shields.io/badge/Cost-$0%20per%20video-brightgreen?style=flat-square)](SETUP.md)
+[![Automation](https://img.shields.io/badge/Automation-Bhakti%20Dhun-blue?style=flat-square)](SETUP.md)
 [![Stars](https://img.shields.io/github/stars/raunakpatil/yt-agent-ai?style=flat-square)](https://github.com/raunakpatil/yt-agent-ai/stargazers)
 
 [**Quick Start**](#-quick-start) · [**Features**](#-features) · [**Pipeline**](#️-how-it-works) · [**Setup Guide**](SETUP.md) · [**FAQ**](#-faq)
@@ -171,9 +171,9 @@ GEMINI_MODEL = "gemini-3.6-flash"   # preferred model; see Google AI Studio for 
 
 ## 🔑 API Keys and Services
 
-| Service | Key | Free Tier | Where to get it |
+| Service | Key | Notes | Where to get it |
 |---|---|---|---|
-| **Google Gemini** | `GEMINI_API_KEY` | 1500 req/day | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| **Google Gemini** | `GEMINI_API_KEY` | Quota/pricing varies by project | [aistudio.google.com](https://aistudio.google.com/apikey) |
 | **Pixabay** | `PIXABAY_API_KEY` | Free API tier | [Pixabay API docs](https://pixabay.com/api/docs/) |
 | **Edge TTS** | *(none)* | Unlimited | Built-in |
 | **YouTube API** | `client_secret.json` | Free | [Google Cloud Console](https://console.cloud.google.com) |
