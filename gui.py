@@ -252,6 +252,9 @@ def _run_pipeline(steps: list, topic_override: str = "", video_type: str = "norm
         from video.creator       import create_video
         from video.music         import mix_music_with_narration
 
+        # Enforce Hindi female voice regardless of stale settings or saved jobs.
+        config.VOICE_ID = "hi-IN-SwaraNeural"
+
         # ── Research ──────────────────────────────────────────
         if "research" in steps:
             _stage("research", "running")
@@ -280,8 +283,10 @@ def _run_pipeline(steps: list, topic_override: str = "", video_type: str = "norm
             _stage("script", "running")
             _log(f"Generating {'Shorts' if video_type == 'shorts' else 'normal'} script…")
             script = write_script(research, video_type=video_type)
+            script["topic"] = research.get("topic", research.get("video_title", topic_override))
+            script["video_type"] = video_type
             _state["script"] = script
-            with open(f"{config.OUTPUT_DIR}/script.json", "w") as f:
+            with open(f"{config.OUTPUT_DIR}/script.json", "w", encoding="utf-8") as f:
                 json.dump(script, f, indent=2)
             _stage("script", "done")
             _log(f"Script: {len(script['sections'])} sections")
@@ -682,7 +687,7 @@ def upload():
 def get_settings():
     return jsonify({
         "gemini_key":      config.GEMINI_API_KEY,
-        "pexels_key":      config.PEXELS_API_KEY,
+        "pixabay_key":      getattr(config, "PIXABAY_API_KEY", ""),
         "music_enabled":   getattr(config, "MUSIC_ENABLED", True),
         "music_volume":    getattr(config, "MUSIC_VOLUME", 0.12),
         "music_library":   getattr(config, "MUSIC_LIBRARY_DIR", ""),
@@ -708,7 +713,7 @@ def save_settings():
     # Update live config object
     m = {
         "gemini_key":    "GEMINI_API_KEY",
-        "pexels_key":    "PEXELS_API_KEY",
+        "pixabay_key":    "PIXABAY_API_KEY",
         "music_enabled": "MUSIC_ENABLED",
         "music_volume":  "MUSIC_VOLUME",
         "channel_name":  "CHANNEL_NAME",
@@ -728,6 +733,8 @@ def save_settings():
     for k, attr in m.items():
         if k in body:
             val = body[k]
+            if attr == "VOICE_ID":
+                val = "hi-IN-SwaraNeural"
             if attr in ("OVERLAY_OPACITY","KB_ZOOM_START","KB_ZOOM_END","MUSIC_VOLUME",
                           "BROLL_INTERVAL","BROLL_XFADE_DUR"):
                 val = float(val)
@@ -742,11 +749,11 @@ def save_settings():
 
         patches = {
             "GEMINI_API_KEY":    body.get("gemini_key"),
-            "PEXELS_API_KEY":    body.get("pexels_key"),
+            "PIXABAY_API_KEY":   body.get("pixabay_key"),
             "MUSIC_ENABLED":     body.get("music_enabled"),
             "MUSIC_VOLUME":      body.get("music_volume"),
             "CHANNEL_NAME":      body.get("channel_name"),
-            "VOICE_ID":          body.get("voice_id"),
+            "VOICE_ID":          "hi-IN-SwaraNeural" if body.get("voice_id") is not None else None,
             "VOICE_RATE":        body.get("voice_rate"),
             "VOICE_PITCH":       body.get("voice_pitch"),
             "GEMINI_MODEL":      body.get("gemini_model"),
