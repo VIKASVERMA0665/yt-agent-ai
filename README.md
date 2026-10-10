@@ -178,7 +178,7 @@ GEMINI_MODEL = "gemini-2.0-flash"   # 1500 free req/day — recommended default
 | Service | Key | Free Tier | Where to get it |
 |---|---|---|---|
 | **Google Gemini** | `GEMINI_API_KEY` | 1500 req/day | [aistudio.google.com](https://aistudio.google.com/apikey) |
-| **Pexels** | `PEXELS_API_KEY` | 200 req/hour | [pixabay.com/api/docs](https://www.pexels.com/api/) |
+| **Pixabay** | `PIXABAY_API_KEY` | Free API tier | [Pixabay API docs](https://pixabay.com/api/docs/) |
 | **Edge TTS** | *(none)* | Unlimited | Built-in |
 | **YouTube API** | `client_secret.json` | Free | [Google Cloud Console](https://console.cloud.google.com) |
 | **ElevenLabs** | `ELEVENLABS_API_KEY` | Optional | [elevenlabs.io](https://elevenlabs.io) |
@@ -200,7 +200,7 @@ Target audience: adults 25-40 who enjoy Lex Fridman and Hidden Brain.
 CHANNEL_NAME = "Mind Mechanics"
 
 # 2. Pick your voice
-VOICE_ID = "en-GB-RyanNeural"   # British, deep, cinematic
+VOICE_ID = "hi-IN-SwaraNeural"   # Hindi female voice used by Bhakti Dhun
 
 # 3. Brand colours (RGB tuples)
 COLORS = {
