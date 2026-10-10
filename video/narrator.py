@@ -286,20 +286,10 @@ async def _synthesise(text: str, audio_path: str, srt_path: str) -> int:
     # 3. Sentence-level fallback (always works, uses AudioFileClip for duration)
     if cue_count == 0:
         if not word_events:
-            # Microsoft periodically disables WordBoundary events server-side.
-            # The sentence-level fallback always produces correct timing, but
-            # word-synced captions require a voice that still emits events.
-            WORD_SYNCED = [
-                ("en-US-AndrewNeural", "Andrew (US, Warm male)"),
-                ("en-GB-LibbyNeural",  "Libby  (UK, Clear female)"),
-            ]
-            alternatives = [(v, n) for v, n in WORD_SYNCED if v != config.VOICE_ID]
+            # Keep the requested Hindi female voice even when Edge TTS omits
+            # word-boundary events; use the sentence-level caption fallback.
             print(f"   ⚠ '{config.VOICE_ID}' sent no word-timing data (Microsoft server change).")
-            print( "      Captions are sentence-level (timing is correct, sync is approximate).")
-            if alternatives:
-                print( "      For word-synced captions, switch voice in the GUI or set in config.py:")
-                for voice_id, label in alternatives:
-                    print(f"        {label:<28}  VOICE_ID = \"{voice_id}\"")
+            print( "      Keeping Hindi female Swara; captions use sentence-level timing.")
         print("   → Using sentence-level caption fallback (approximate sync)…")
         cue_count = _build_sentence_srt(text, audio_path, srt_path)
 
@@ -381,7 +371,6 @@ def generate_narration(script: dict, output_dir: str) -> str:
 
     if coverage < 85:
         print(f"   ⚠ Caption coverage {coverage:.0f}% — captions will disappear before audio ends.")
-        print( "      Fix: change VOICE_ID in config.py to  en-GB-RyanNeural")
-        print( "      That voice emits proper word-level timing events.")
+        print( "      Hindi female Swara is retained; sentence-level caption timing may be approximate.")
 
     return audio_path
