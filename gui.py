@@ -304,7 +304,8 @@ def _run_pipeline(steps: list, topic_override: str = "", video_type: str = "norm
         script.setdefault("video_type", video_type)
 
         # ── Images ────────────────────────────────────────────
-        if "images" in steps:
+        # Any video render must use fresh topic-matched images; never reuse stale stock.
+        if "images" in steps or "video" in steps:
             _stage("images", "running")
             image_map = download_images(script, config.OUTPUT_DIR)
             _state["image_map"] = image_map
@@ -321,7 +322,8 @@ def _run_pipeline(steps: list, topic_override: str = "", video_type: str = "norm
         _check_stop("images")
 
         # ── Narration ─────────────────────────────────────────
-        if "narration" in steps:
+        # Any video render must synthesize fresh Swara narration and matching captions.
+        if "narration" in steps or "video" in steps:
             _stage("narration", "running")
             audio_path = generate_narration(script, config.OUTPUT_DIR)
             _state["audio_path"] = audio_path
