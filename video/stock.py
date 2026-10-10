@@ -1,6 +1,11 @@
 """Stock image downloader for YT Agent AI — Pixabay API."""
 import os
 import re
+import io
+import json
+import shutil
+import hashlib
+import tempfile
 import requests
 from PIL import Image, ImageDraw, ImageFont
 import config
@@ -208,82 +213,306 @@ def _clean_visual_query(query: str) -> str:
     return re.sub(r"\s+", " ", query).strip(" -,")
 
 
+def _strip_html(value) -> str:
+    return re.sub(r"<[^>]+>", " ", str(value or "")).replace("&nbsp;", " ").strip()
+
+
+def _pixabay_candidates(query: str, orientation: str) -> list:
+    api_key = getattr(config, "PIXABAY_API_KEY", "")
+    if not api_key or api_key.startswith("YOUR_"):
+        return []
+    try:
+        hits = _search_pixabay(api_key, query, orientation, per_page=12)
+    except Exception as exc:
+        print("   ⚠ Pixabay search error: " + str(exc))
+        return []
+    return [{
+        "source": "Pixabay",
+        "url": item.get("largeImageURL") or item.get("webformatURL") or "",
+        "page_url": item.get("pageURL", ""),
+        "title": item.get("tags", ""),
+        "tags": item.get("tags", ""),
+        "credit": item.get("user", ""),
+        "license": "Pixabay Content License",
+    } for item in hits if item.get("largeImageURL") or item.get("webformatURL")]
+
+
+def _wikimedia_candidates(query: str) -> list:
+    """Search Wikimedia Commons and keep only reusable, commercial-friendly licenses."""
+    endpoint = "https://commons.wikimedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "generator": "search",
+        "gsrsearch": "filetype:bitmap " + query,
+        "gsrnamespace": 6,
+        "gsrlimit": 12,
+        "prop": "imageinfo",
+        "iiprop": "url|extmetadata",
+        "iiurlwidth": 1200,
+        "format": "json",
+    }
+    try:
+        response = requests.get(endpoint, params=params, timeout=20,
+                                headers={"User-Agent": "YtAgentAI/1.0 (devotional video image licensing check)"})
+        response.raise_for_status()
+        pages = response.json().get("query", {}).get("pages", {}).values()
+    except Exception as exc:
+        print("   ⚠ Wikimedia Commons search error: " + str(exc))
+        return []
+
+    candidates = []
+    for page in pages:
+        info_list = page.get("imageinfo") or []
+        if not info_list:
+            continue
+        info = info_list[0]
+        meta = info.get("extmetadata") or {}
+        license_name = _strip_html((meta.get("LicenseShortName") or {}).get("value", ""))
+        license_lower = license_name.lower()
+        allowed = (
+            "public domain" in license_lower or "cc0" in license_lower
+            or (license_lower.startswith("cc by") and "nc" not in license_lower and "nd" not in license_lower)
+        )
+        if not allowed:
+            continue
+        candidates.append({
+            "source": "Wikimedia Commons",
+            "url": info.get("thumburl") or info.get("url") or "",
+            "page_url": info.get("descriptionurl", ""),
+            "title": _strip_html((meta.get("ImageDescription") or {}).get("value", "")) or page.get("title", ""),
+            "tags": page.get("title", ""),
+            "credit": _strip_html((meta.get("Artist") or {}).get("value", "")) or _strip_html((meta.get("Credit") or {}).get("value", "")),
+            "license": license_name,
+        })
+    return [item for item in candidates if item.get("url")]
+
+
+def _pexels_candidates(query: str, orientation: str) -> list:
+    """Pexels is an optional fallback; it is used only when PEXELS_API_KEY is configured."""
+    api_key = os.getenv("PEXELS_API_KEY", "").strip()
+    if not api_key:
+        return []
+    try:
+        response = requests.get(
+            "https://api.pexels.com/v1/search",
+            params={"query": query, "per_page": 12, "orientation": orientation},
+            headers={"Authorization": api_key},
+            timeout=20,
+        )
+        response.raise_for_status()
+        photos = response.json().get("photos", [])
+    except Exception as exc:
+        print("   ⚠ Pexels search error: " + str(exc))
+        return []
+    return [{
+        "source": "Pexels",
+        "url": (photo.get("src") or {}).get("large") or (photo.get("src") or {}).get("original") or "",
+        "page_url": photo.get("url", ""),
+        "title": photo.get("alt", ""),
+        "tags": photo.get("alt", ""),
+        "credit": photo.get("photographer", ""),
+        "license": "Pexels License",
+    } for photo in photos if (photo.get("src") or {}).get("large") or (photo.get("src") or {}).get("original")]
+
+
+def _download_candidate(candidate: dict, path: str) -> bool:
+    """Download, validate and normalize a candidate to JPEG before vision checking."""
+    url = candidate.get("url", "")
+    if not url:
+        return False
+    try:
+        response = requests.get(url, timeout=30, stream=True, headers={"User-Agent": "YtAgentAI/1.0"})
+        response.raise_for_status()
+        chunks = []
+        total = 0
+        for chunk in response.iter_content(8192):
+            if not chunk:
+                continue
+            total += len(chunk)
+            if total > 25 * 1024 * 1024:
+                raise ValueError("image exceeds 25 MB limit")
+            chunks.append(chunk)
+        raw = b"".join(chunks)
+        if len(raw) < 1024:
+            return False
+        with Image.open(io.BytesIO(raw)) as source:
+            source.load()
+            if source.width < 240 or source.height < 240:
+                return False
+            source.convert("RGB").save(path, format="JPEG", quality=90, optimize=True)
+        return os.path.getsize(path) > 1024
+    except Exception as exc:
+        print("   ⚠ Candidate download/validation failed: " + str(exc))
+        return False
+
+
+def _provider_candidates(query: str, orientation: str) -> list:
+    providers = [
+        ("Pixabay", _pixabay_candidates),
+        ("Wikimedia Commons", _wikimedia_candidates),
+    ]
+    if os.getenv("PEXELS_API_KEY", "").strip():
+        providers.append(("Pexels", _pexels_candidates))
+    for source_name, searcher in providers:
+        results = searcher(query, orientation)
+        if results:
+            yield source_name, results
+
+
 def download_images(script: dict, output_dir: str) -> dict:
     """
-    Download scene-specific devotional visuals with a strict deity anchor.
-    AI-provided queries are never used alone: every search is anchored to the
-    actual topic, and fallbacks stay with the same deity/festival.
+    For each scene, search up to five query variants across available sources.
+    Gemini vision checks real image pixels and metadata; only candidates scoring
+    >=80/100 are accepted. Failed or uncertain verification is rejected, never
+    silently replaced with an unrelated deity or generic stock photo.
     """
+    from agents.gemini_client import verify_image_candidates
+
     images_dir = os.path.join(output_dir, "images")
     os.makedirs(images_dir, exist_ok=True)
     is_shorts = script.get("video_type") == "shorts"
     orientation = "portrait" if is_shorts else "landscape"
     anchor, safe_fallbacks = _topic_visual_profile(script)
     image_map = {}
-    print(f"   🔎 Strict visual subject: {anchor} (Pixabay)")
+    source_manifest = {}
+    print("   🔎 Gemini-verified visual subject: " + anchor)
+    print("   🔁 Up to 5 topic-specific searches; sources: Pixabay, Wikimedia Commons"
+          + (", Pexels" if os.getenv("PEXELS_API_KEY", "").strip() else ""))
 
     for section in script.get("sections", []):
         sid = int(section.get("id", len(image_map) + 1))
         section_text = " ".join([
-            str(section.get("title", "")), str(section.get("narration", "")),
-            str(section.get("caption_text", ""))
-        ]).lower()
-
-        # Prefer AI's scene-specific searches, but prepend the exact deity anchor.
+            str(section.get("title", "")),
+            str(section.get("narration", "")),
+            str(section.get("caption_text", "")),
+        ]).strip()
+        section_lower = section_text.lower()
         raw_queries = [
             section.get("image_query", ""),
             section.get("image_query_2", ""),
             section.get("image_query_3", ""),
             section.get("image_query_4", ""),
         ]
-        queries = []
+
+        if anchor == "Maa Shailputri":
+            if any(t in section_lower for t in ("nandi", "नंदी", "वृषभ", "bull", "बैल")):
+                preferred = "Maa Shailputri riding Nandi bull"
+            elif any(t in section_lower for t in ("trishul", "त्रिशूल")):
+                preferred = "Maa Shailputri holding trident"
+            elif any(t in section_lower for t in ("lotus", "कमल")):
+                preferred = "Maa Shailputri holding lotus"
+            else:
+                preferred = "Maa Shailputri Navdurga goddess idol white clothes"
+        elif anchor.startswith("Maa ") and anchor != "Maa Durga":
+            preferred = anchor + " Navdurga goddess idol"
+        else:
+            preferred = anchor + " devotional idol"
+
+        query_list = [preferred]
         for raw in raw_queries:
             detail = _clean_visual_query(raw)
-            # Discard abstract/unrelated query fragments instead of showing random stock.
-            if not detail:
-                continue
-            q = f"{anchor} {detail}"
-            if q.lower() not in [x.lower() for x in queries]:
-                queries.append(q)
+            if detail:
+                query_list.append(anchor + " " + detail)
+        query_list.extend(anchor + " " + _clean_visual_query(q) for q in safe_fallbacks)
+        queries = []
+        for query in query_list:
+            query = re.sub(r"\s+", " ", query).strip()
+            if query and query.lower() not in [item.lower() for item in queries]:
+                queries.append(query)
+        queries = queries[:5]
 
-        # Topic-specific visual beats take priority for Navdurga / Shailputri.
-        if anchor == "Maa Shailputri":
-            if any(t in section_text for t in ("bail", "bull", "nandi", "नंदी", "वृषभ")):
-                queries.insert(0, "Maa Shailputri riding Nandi bull")
-            elif any(t in section_text for t in ("trishul", "त्रिशूल")):
-                queries.insert(0, "Maa Shailputri holding trident")
-            elif any(t in section_text for t in ("kamal", "lotus", "कमल")):
-                queries.insert(0, "Maa Shailputri holding lotus")
-            else:
-                queries.insert(0, "Maa Shailputri Navdurga goddess idol white clothes")
-        elif anchor.startswith("Maa ") and anchor != "Maa Durga":
-            queries.insert(0, f"{anchor} Navdurga goddess idol")
-        else:
-            queries.insert(0, f"{anchor} devotional idol")
+        wanted = 4 if is_shorts else 3
+        accepted_paths = []
+        used_digests = set()
+        attempt_count = 0
 
-        # Do not allow a generated query to turn into a generic unrelated fallback.
-        queries = list(dict.fromkeys(q for q in queries if q.strip()))
-        paths = []
-        wanted = min(4, max(2, len(queries))) if is_shorts else 3
-        for qi, query in enumerate(queries):
-            if len(paths) >= wanted:
-                break
-            paths.extend(_fetch_images(
-                query, sid, images_dir, count=1, orientation=orientation,
-                img_num_start=qi, fallback_queries=safe_fallbacks
-            ))
+        with tempfile.TemporaryDirectory(prefix="verify_scene_", dir=images_dir) as temp_dir:
+            for query in queries:
+                if len(accepted_paths) >= wanted or attempt_count >= 5:
+                    break
+                attempt_count += 1
+                print("      🔍 Search " + str(attempt_count) + "/5: " + query)
+                found_for_query = False
 
-        if not paths:
+                for source_name, results in _provider_candidates(query, orientation):
+                    downloaded = []
+                    for idx, candidate in enumerate(results[:8], start=1):
+                        candidate_path = os.path.join(temp_dir, "candidate_" + str(idx) + ".jpg")
+                        if _download_candidate(candidate, candidate_path):
+                            downloaded.append({**candidate, "path": candidate_path})
+                    if not downloaded:
+                        continue
+
+                    try:
+                        checks = verify_image_candidates(
+                            expected_subject=anchor,
+                            scene_context=section_text or section.get("title", ""),
+                            candidates=downloaded,
+                        )
+                    except Exception as exc:
+                        print("      ⚠ Gemini verification unavailable; rejecting unverified "
+                              + source_name + " candidates: " + str(exc))
+                        continue
+
+                    approved = [
+                        (downloaded[item["index"] - 1], item)
+                        for item in checks
+                        if item.get("relevant") and 1 <= item.get("index", 0) <= len(downloaded)
+                    ]
+                    approved.sort(key=lambda pair: pair[1].get("score", 0), reverse=True)
+                    chosen = None
+                    chosen_check = None
+                    for candidate, check in approved:
+                        digest = hashlib.sha256(open(candidate["path"], "rb").read()).hexdigest()
+                        if digest not in used_digests:
+                            chosen, chosen_check = candidate, check
+                            used_digests.add(digest)
+                            break
+                    if chosen is None:
+                        print("      ✗ Gemini rejected all " + source_name + " candidates for this query")
+                        continue
+
+                    final_name = "section_" + str(sid).zfill(2) + "_img" + str(len(accepted_paths) + 1).zfill(2) + ".jpg"
+                    final_path = os.path.join(images_dir, final_name)
+                    shutil.copy2(chosen["path"], final_path)
+                    accepted_paths.append(final_path)
+                    source_manifest[os.path.relpath(final_path, output_dir)] = {
+                        "source": chosen.get("source", source_name),
+                        "source_page": chosen.get("page_url", ""),
+                        "source_title": chosen.get("title", ""),
+                        "credit": chosen.get("credit", ""),
+                        "license": chosen.get("license", ""),
+                        "search_query": query,
+                        "gemini_score": chosen_check.get("score", 0),
+                        "gemini_reason": chosen_check.get("reason", ""),
+                    }
+                    print("      ✓ Accepted " + source_name + " image (Gemini score "
+                          + str(chosen_check.get("score", 0)) + "/100)")
+                    found_for_query = True
+                    break
+
+                if not found_for_query:
+                    print("      ✗ No verified image on this attempt; trying a new query/source")
+
+        if not accepted_paths:
             if anchor != "Hindu devotional":
                 raise RuntimeError(
-                    f"No topic-matched Pixabay images found for '{anchor}' in section {sid}. "
-                    "Check PIXABAY_API_KEY/connectivity; refusing to render unrelated visuals."
+                    "No verified topic-matched image found for '" + anchor + "' in section "
+                    + str(sid) + " after up to 5 query attempts. Rendering stopped to avoid "
+                    "showing the wrong deity. Check Gemini/Pixabay connectivity and quotas. "
+                    "Optional: set PEXELS_API_KEY to enable Pexels fallback."
                 )
-            fallback_path = os.path.join(images_dir, f"section_{sid:02d}_fallback.png")
+            fallback_path = os.path.join(images_dir, "section_" + str(sid).zfill(2) + "_fallback.png")
             _make_fallback_image(fallback_path)
-            paths = [fallback_path]
-            print("         ⚠ No stock results; using a generic fallback graphic.")
+            accepted_paths = [fallback_path]
+            print("      ⚠ Generic devotional fallback graphic used for an unspecified subject.")
 
-        image_map[sid] = paths
-        print(f"         [{sid}] {anchor}: saved {len(paths)} topic-anchored image(s)")
+        image_map[sid] = accepted_paths
+        print("         [" + str(sid) + "] " + anchor + ": " + str(len(accepted_paths))
+              + " verified image(s)")
+
+    manifest_path = os.path.join(output_dir, "image_sources.json")
+    with open(manifest_path, "w", encoding="utf-8") as manifest_file:
+        json.dump(source_manifest, manifest_file, ensure_ascii=False, indent=2)
+    print("   📄 Source/license manifest saved: " + manifest_path)
     return image_map
