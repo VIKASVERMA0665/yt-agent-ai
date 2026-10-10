@@ -11,11 +11,9 @@ from google import genai
 from google.genai import types
 import config
 
-# Full list of supported models in preference order.
-# The actual runtime order is determined by build_chain() below,
-# which rotates this list so config.GEMINI_MODEL comes first.
+# Gemini 3.5 Flash Lite is preferred; Gemini 3.6 is excluded because it repeatedly fails here.
+# build_chain() rotates the supported models so config.GEMINI_MODEL comes first.
 _ALL_MODELS = [
-    "gemini-3.6-flash",
     "gemini-3.5-flash-lite",
     "gemini-2.5-flash",
 ]
