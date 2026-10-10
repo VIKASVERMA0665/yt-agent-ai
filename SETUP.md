@@ -69,16 +69,16 @@ pip install -r requirements.txt
 
 ```bash
 # Mac / Linux
-export GEMINI_API_KEY="your_key_here"
-export PEXELS_API_KEY="your_key_here"
+export GEMINI_API_KEY="your_pixabay_api_key_here"
+export PIXABAY_API_KEY="your_pixabay_api_key_here"
 
 # Windows (Command Prompt)
-set GEMINI_API_KEY=your_key_here
-set PEXELS_API_KEY=your_key_here
+set GEMINI_API_KEY=your_pixabay_api_key_here
+set PIXABAY_API_KEY=your_pixabay_api_key_here
 
 # Windows (PowerShell)
-$env:GEMINI_API_KEY="your_key_here"
-$env:PEXELS_API_KEY="your_key_here"
+$env:GEMINI_API_KEY="your_pixabay_api_key_here"
+$env:PIXABAY_API_KEY="your_pixabay_api_key_here"
 ```
 
 To make these permanent, add them to your shell profile (`~/.bashrc`, `~/.zshrc`) or use a `.env` file:
@@ -94,7 +94,7 @@ Open `config.py` and replace the placeholder values:
 
 ```python
 GEMINI_API_KEY = "AIza..."     # your Gemini key
-PEXELS_API_KEY = "abc123..."   # your Pixabay key
+PIXABAY_API_KEY = "abc123..."   # your Pixabay API key
 ```
 
 ---
