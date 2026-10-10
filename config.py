@@ -67,11 +67,11 @@ VOICE_PITCH = "+0Hz"    # keep the natural neural-voice pitch
 #  through all models below if quota or errors are hit.
 #  Change this in the GUI under Settings → AI Model, or here directly.
 #  Models supported by agents/gemini_client.py:
-#    gemini-3.6-flash       — preferred
-#    gemini-3.5-flash-lite  — lightweight fallback
-#    gemini-2.5-flash       — final fallback (access may vary by project)
+#    gemini-3.5-flash-lite  — preferred
+#    gemini-2.5-flash       — fallback (access may vary by project)
+#  Gemini 3.6 is intentionally excluded because it repeatedly fails here.
 #  Check Google AI Studio for current quota and pricing.
-GEMINI_MODEL = "gemini-3.6-flash"
+GEMINI_MODEL = "gemini-3.5-flash-lite"
 
 # ─────────────────────────────────────────
 #  Video Dimensions
