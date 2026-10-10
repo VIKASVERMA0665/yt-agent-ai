@@ -262,10 +262,15 @@ def download_images(script: dict, output_dir: str) -> dict:
             ))
 
         if not paths:
+            if anchor != "Hindu devotional":
+                raise RuntimeError(
+                    f"No topic-matched Pixabay images found for '{anchor}' in section {sid}. "
+                    "Check PIXABAY_API_KEY/connectivity; refusing to render unrelated visuals."
+                )
             fallback_path = os.path.join(images_dir, f"section_{sid:02d}_fallback.png")
             _make_fallback_image(fallback_path)
             paths = [fallback_path]
-            print(f"         ⚠ No matching {anchor} stock images found; using devotional fallback graphic.")
+            print("         ⚠ No stock results; using a generic fallback graphic.")
 
         image_map[sid] = paths
         print(f"         [{sid}] {anchor}: saved {len(paths)} topic-anchored image(s)")
