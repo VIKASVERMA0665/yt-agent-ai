@@ -169,6 +169,21 @@ GEMINI_MODEL = "gemini-3.5-flash-lite"   # preferred model; see Google AI Studio
 
 ---
 
+
+## Scheduled direct upload (no PC review)
+
+For scheduled jobs that should upload immediately after rendering, call the repository's
+`run_scheduled_video.ps1` launcher instead of running `pipeline.py --no-review`.
+It runs the pipeline with `--auto-upload`, keeps the working directory anchored to the
+repository, and skips the local review dashboard. Example from PowerShell:
+
+```powershell
+.\run_scheduled_video.ps1 -VideoType shorts -Topic "जय माता दी — माँ दुर्गा की महिमा"
+```
+
+Uploads use `VIDEO_PRIVACY` from `config.py` (currently `unlisted`) so you can inspect
+the uploaded video in YouTube Studio before making it public.
+
 ## 🔑 API Keys and Services
 
 | Service | Key | Notes | Where to get it |
