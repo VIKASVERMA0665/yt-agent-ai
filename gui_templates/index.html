@@ -599,14 +599,9 @@ input[type=range]{width:100%;accent-color:var(--primary)}
             <div class="settings-field">
               <div class="field-label">Starting Model</div>
               <select id="s-model">
-                <option value="gemini-2.5-flash">gemini-2.5-flash — highest quality (500 req/day free)</option>
-                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite — fast + smart</option>
-                <option value="gemma-4-31b-it">gemma-4-31b-it — Gemma 4 31B (strong reasoning, free)</option>
-                <option value="gemini-2.0-flash" selected>gemini-2.0-flash — recommended (1500 req/day free)</option>
-                <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite — fastest (1500 req/day free)</option>
-                <option value="gemma-3-27b-it">gemma-3-27b-it — Gemma 3 27B</option>
-                <option value="gemini-1.5-flash-001">gemini-1.5-flash-001 — reliable fallback</option>
-                <option value="gemini-1.5-pro-001">gemini-1.5-pro-001 — pro quality fallback</option>
+                <option value="gemini-3.6-flash">gemini-3.6-flash — preferred</option>
+                <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite — lightweight fallback</option>
+                <option value="gemini-2.5-flash">gemini-2.5-flash — stable fallback</option>
               </select>
               <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
                 The chain starts here and automatically falls back through all remaining models
