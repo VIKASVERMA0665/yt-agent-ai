@@ -237,7 +237,7 @@ def _pixabay_candidates(query: str, orientation: str) -> list:
     } for item in hits if item.get("largeImageURL") or item.get("webformatURL")]
 
 
-def _wikimedia_candidates(query: str) -> list:
+def _wikimedia_candidates(query: str, orientation: str = "landscape") -> list:
     """Search Wikimedia Commons and keep only reusable, commercial-friendly licenses."""
     endpoint = "https://commons.wikimedia.org/w/api.php"
     params = {
