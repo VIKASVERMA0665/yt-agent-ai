@@ -125,7 +125,7 @@ yt-agent-ai/
 │
 ├── video/
 │   ├── narrator.py             ← Edge-TTS voiceover generator
-│   ├── stock.py                ← Pexels image downloader
+│   ├── stock.py                ← Pixabay topic-matched image downloader
 │   ├── creator.py              ← Full video renderer (Ken Burns, captions, etc.)
 │   └── music.py                ← Background music mixer
 │
@@ -223,7 +223,7 @@ OVERLAY_OPACITY    = 0.62  # how dark the image overlay is
 
 No. The entire stack uses free tiers:
 - **Gemini** — 1500 req/day free on the 2.0-flash model
-- **Pexels** — 200 req/hour free
+- **Pixabay** — free API tier
 - **Edge TTS** — completely free, no account needed
 - **YouTube Data API** — free for uploads
 - **Video rendering** — runs locally on your machine (CPU/GPU)
