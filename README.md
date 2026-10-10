@@ -25,7 +25,7 @@
 | 🧠 **AI Research** | Gemini scans for trending topics tailored to your channel niche |
 | ✍️ **Script Writing** | Full narrated script with hook, sections, and CTA — in JSON |
 | 🎙️ **Free Voice** | Microsoft Edge TTS (no API key, no cost, word-level timing) |
-| 🖼️ **Stock Images** | Auto-downloads from Pixabay with deity/topic-anchored search |
+| 🖼️ **Verified Images** | Gemini vision checks actual images; rejects mismatches and retries Pixabay/Wikimedia, with optional Pexels fallback |
 | 🎞️ **Animated Video** | Ken Burns zoom, smooth crossfades, captions, progress bars |
 | 📱 **Shorts Support** | Generates vertical 9:16 Shorts alongside the main video |
 | 🕵️ **Human Review** | Local web dashboard to watch and approve before publishing |
@@ -100,7 +100,7 @@ python pipeline.py  ──►  Research  ──►  Script  ──►  Narration
 | 1 · Research | `agents/researcher.py` | Gemini brainstorms trending topics for your niche and outputs a structured brief |
 | 2 · Script | `agents/scriptwriter.py` | Expands the brief into a full narrated script with image queries per section |
 | 3 · Narration | `video/narrator.py` | Edge-TTS converts the script to a cinematic MP3 voiceover |
-| 4 · Images | `video/stock.py` | Downloads high-res stock photos from Pixabay, topic-aware per section |
+| 4 · Images | `video/stock.py` | Searches Pixabay/Wikimedia Commons (optional Pexels), then Gemini vision checks each candidate against the exact deity and scene |
 | 5 · Video | `video/creator.py` | Renders animated slides with Ken Burns, crossfades, captions, and music |
 | 6 · Review | `review/app.py` | Spins up a local dashboard — you watch and approve before anything is published |
 | 7 · Upload | `uploader/youtube.py` | Publishes to YouTube with full SEO metadata on your approval |

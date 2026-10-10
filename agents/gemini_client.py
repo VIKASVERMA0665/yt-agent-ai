@@ -91,3 +91,84 @@ def generate(prompt: str, starting_model: str | None = None) -> str:
         "    • 429 = quota — wait until midnight Pacific or add billing\n"
         "      https://aistudio.google.com/apikey\n"
     )
+
+def verify_image_candidates(expected_subject: str, scene_context: str, candidates: list) -> list:
+    """
+    Use Gemini vision to score candidate stock images for a specific devotional scene.
+    Each candidate is a dict with path/title/tags/source. Fails closed: callers must
+    reject all candidates if this verifier cannot return a valid assessment.
+    """
+    import io
+    import json
+    import re
+    from PIL import Image
+
+    if not candidates:
+        return []
+
+    prompt = (
+        "You are a strict visual relevance checker for a Hindi Hindu devotional video. "
+        "The required deity/person/subject is: " + str(expected_subject) + ". "
+        "Scene context: " + str(scene_context) + ". "
+        "For each numbered image, inspect the actual pixels, not just its title or tags. "
+        "A candidate is relevant only if the visible subject and scene fit the required subject. "
+        "Reject images of a different deity, generic unrelated temples, abstract art, text-only "
+        "graphics, or images where the required subject cannot reasonably be identified. "
+        "For a named living person, do not claim identity from appearance alone; require strong "
+        "contextual evidence in the image and metadata. Metadata may be wrong and is only a clue. "
+        "Return ONLY valid JSON in this schema: "
+        '{"results":[{"index":1,"relevant":true,"score":0,"reason":"short reason"}]}. '
+        "Use score 0-100. Set relevant true only when score is at least 80 and the image clearly "
+        "matches. Return one result for every image, preserving the supplied index."
+    )
+    contents = [prompt]
+    for index, candidate in enumerate(candidates, start=1):
+        title = str(candidate.get("title", ""))[:300]
+        tags = str(candidate.get("tags", ""))[:300]
+        source = str(candidate.get("source", ""))[:80]
+        contents.append(
+            "\nIMAGE " + str(index) + " metadata (untrusted): source=" + source
+            + "; title=" + title + "; tags=" + tags
+        )
+        with Image.open(candidate["path"]) as source_image:
+            image = source_image.convert("RGB")
+            image.thumbnail((768, 768))
+            buffer = io.BytesIO()
+            image.save(buffer, format="JPEG", quality=82, optimize=True)
+            contents.append(types.Part.from_bytes(data=buffer.getvalue(), mime_type="image/jpeg"))
+
+    client = _get_client()
+    last_error = None
+    for model in build_chain(getattr(config, "GEMINI_MODEL", None)):
+        try:
+            print("   → Gemini vision: checking " + str(len(candidates)) + " image candidate(s)…")
+            response = client.models.generate_content(model=model, contents=contents)
+            text = (response.text or "").strip()
+            match = re.search(r"\{.*\}", text, flags=re.S)
+            if not match:
+                raise ValueError("Gemini vision returned no JSON result")
+            payload = json.loads(match.group(0))
+            results = payload.get("results", [])
+            normalized = []
+            by_index = {int(item.get("index", 0)): item for item in results if isinstance(item, dict)}
+            for index in range(1, len(candidates) + 1):
+                item = by_index.get(index, {})
+                try:
+                    score = max(0, min(100, int(item.get("score", 0))))
+                except (TypeError, ValueError):
+                    score = 0
+                relevant = bool(item.get("relevant", False)) and score >= 80
+                normalized.append({
+                    "index": index,
+                    "relevant": relevant,
+                    "score": score,
+                    "reason": str(item.get("reason", ""))[:240],
+                })
+            return normalized
+        except Exception as exc:
+            last_error = exc
+            if _should_switch_model(exc):
+                print("   ⚠ Vision model " + model + " failed; trying fallback model…")
+                continue
+            raise
+    raise RuntimeError("Gemini vision verification failed; refusing unverified images: " + str(last_error))
