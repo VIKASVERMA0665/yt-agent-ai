@@ -299,6 +299,9 @@ def _run_pipeline(steps: list, topic_override: str = "", video_type: str = "norm
         _check_stop("script")
         script = _state["script"]
         if not script: raise ValueError("No script data — run Script step first.")
+        # Older saved scripts may lack topic metadata; restore it before image search.
+        script.setdefault("topic", research.get("topic", research.get("video_title", topic_override)))
+        script.setdefault("video_type", video_type)
 
         # ── Images ────────────────────────────────────────────
         if "images" in steps:
