@@ -7,10 +7,18 @@ import pickle
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 import config
 
 
-TOKEN_FILE = "youtube_token.pickle"
+# Anchor credentials to the repository, not the process working directory.
+# Scheduled tasks often start with a different working directory.
+_REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TOKEN_FILE = os.path.join(_REPO_DIR, "youtube_token.pickle")
+
+
+def _repo_path(path: str) -> str:
+    return path if os.path.isabs(path) else os.path.join(_REPO_DIR, path)
 
 
 def _get_service():
@@ -18,17 +26,34 @@ def _get_service():
     creds = None
 
     if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, "rb") as f:
-            creds = pickle.load(f)
+        try:
+            with open(TOKEN_FILE, "rb") as f:
+                creds = pickle.load(f)
+        except (OSError, pickle.PickleError, EOFError, AttributeError, ValueError) as exc:
+            print(f"   ⚠ Saved YouTube token could not be read; re-authorizing: {exc}")
+            creds = None
+
+    # Refresh an expired token silently when Google provided a refresh token.
+    # Only open the browser when no usable token exists or refresh is impossible.
+    if creds and not creds.valid and creds.expired and creds.refresh_token:
+        try:
+            creds.refresh(Request())
+            with open(TOKEN_FILE, "wb") as f:
+                pickle.dump(creds, f)
+            print("   ✓ Saved YouTube login refreshed; no browser login needed.")
+        except Exception as exc:
+            print(f"   ⚠ Saved YouTube login could not refresh; opening authorization: {exc}")
+            creds = None
 
     if not creds or not creds.valid:
-        if not os.path.exists(config.YOUTUBE_CLIENT_SECRET):
+        client_secret_path = _repo_path(config.YOUTUBE_CLIENT_SECRET)
+        if not os.path.exists(client_secret_path):
             raise FileNotFoundError(
-                f"YouTube OAuth file not found: {config.YOUTUBE_CLIENT_SECRET}\n"
+                f"YouTube OAuth file not found: {client_secret_path}\n"
                 "Follow the setup guide to create it in Google Cloud Console."
             )
         flow = InstalledAppFlow.from_client_secrets_file(
-            config.YOUTUBE_CLIENT_SECRET, config.YOUTUBE_SCOPES
+            client_secret_path, config.YOUTUBE_SCOPES
         )
         creds = flow.run_local_server(port=8080)
         with open(TOKEN_FILE, "wb") as f:
