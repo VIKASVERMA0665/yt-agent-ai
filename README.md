@@ -25,12 +25,12 @@
 | 🧠 **AI Research** | Gemini scans for trending topics tailored to your channel niche |
 | ✍️ **Script Writing** | Full narrated script with hook, sections, and CTA — in JSON |
 | 🎙️ **Free Voice** | Microsoft Edge TTS (no API key, no cost, word-level timing) |
-| 🖼️ **Stock Images** | Auto-downloads from Pexels with topic-aware search |
+| 🖼️ **Stock Images** | Auto-downloads from Pixabay with deity/topic-anchored search |
 | 🎞️ **Animated Video** | Ken Burns zoom, smooth crossfades, captions, progress bars |
 | 📱 **Shorts Support** | Generates vertical 9:16 Shorts alongside the main video |
 | 🕵️ **Human Review** | Local web dashboard to watch and approve before publishing |
 | 🚀 **Auto Upload** | Publishes to YouTube with SEO tags, description, and thumbnail |
-| 🔄 **Smart Fallback** | 8-model chain auto-switches if any model hits quota |
+| 🔄 **Smart Fallback** | 3-model chain auto-switches if any model hits quota |
 | 🎵 **Background Music** | Drop MP3s in `music library/` — auto-looped to fit video length |
 
 ---
@@ -71,7 +71,7 @@ pip install -r requirements.txt
 
 # 3. Set your API keys (copy and edit .env.example)
 cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY and PEXELS_API_KEY
+# Edit .env and add your GEMINI_API_KEY and PIXABAY_API_KEY
 
 # 4. Run the GUI
 python gui.py
@@ -100,7 +100,7 @@ python pipeline.py  ──►  Research  ──►  Script  ──►  Narration
 | 1 · Research | `agents/researcher.py` | Gemini brainstorms trending topics for your niche and outputs a structured brief |
 | 2 · Script | `agents/scriptwriter.py` | Expands the brief into a full narrated script with image queries per section |
 | 3 · Narration | `video/narrator.py` | Edge-TTS converts the script to a cinematic MP3 voiceover |
-| 4 · Images | `video/stock.py` | Downloads high-res stock photos from Pexels, topic-aware per section |
+| 4 · Images | `video/stock.py` | Downloads high-res stock photos from Pixabay, topic-aware per section |
 | 5 · Video | `video/creator.py` | Renders animated slides with Ken Burns, crossfades, captions, and music |
 | 6 · Review | `review/app.py` | Spins up a local dashboard — you watch and approve before anything is published |
 | 7 · Upload | `uploader/youtube.py` | Publishes to YouTube with full SEO metadata on your approval |
@@ -119,7 +119,7 @@ yt-agent-ai/
 ├── 📝  .env.example            ← Copy to .env and fill in your API keys
 │
 ├── agents/
-│   ├── gemini_client.py        ← Shared AI client with 8-model fallback chain
+│   ├── gemini_client.py        ← Shared AI client with 3-model fallback chain
 │   ├── researcher.py           ← Topic research agent
 │   └── scriptwriter.py        ← Script writing agent
 │
@@ -178,7 +178,7 @@ GEMINI_MODEL = "gemini-2.0-flash"   # 1500 free req/day — recommended default
 | Service | Key | Free Tier | Where to get it |
 |---|---|---|---|
 | **Google Gemini** | `GEMINI_API_KEY` | 1500 req/day | [aistudio.google.com](https://aistudio.google.com/apikey) |
-| **Pexels** | `PEXELS_API_KEY` | 200 req/hour | [pexels.com/api](https://www.pexels.com/api/) |
+| **Pexels** | `PEXELS_API_KEY` | 200 req/hour | [pixabay.com/api/docs](https://www.pexels.com/api/) |
 | **Edge TTS** | *(none)* | Unlimited | Built-in |
 | **YouTube API** | `client_secret.json` | Free | [Google Cloud Console](https://console.cloud.google.com) |
 | **ElevenLabs** | `ELEVENLABS_API_KEY` | Optional | [elevenlabs.io](https://elevenlabs.io) |
