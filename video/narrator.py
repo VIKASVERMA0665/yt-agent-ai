@@ -313,8 +313,10 @@ async def _synthesise(text: str, audio_path: str, srt_path: str) -> int:
 def generate_narration(script: dict, output_dir: str) -> str:
     """
     Concatenates all section narrations → synthesises MP3 → writes SRT.
+    Bhakti Dhun is locked to the Hindi female Swara voice; no male fallback.
     Returns path to the saved audio file.
     """
+    config.VOICE_ID = "hi-IN-SwaraNeural"
     parts = []
     for section in script["sections"]:
         narration = section.get("narration", "").strip()

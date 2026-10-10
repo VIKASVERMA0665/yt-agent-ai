@@ -29,13 +29,10 @@ CHANNEL_NAME = "Bhakti Dhun"   # shown on-screen and in upload metadata
 
 # ─────────────────────────────────────────
 #  Voice (Edge TTS — free, no API key)
-#  Voices confirmed to emit word-level timing (needed for caption sync):
-#    en-GB-RyanNeural     — British, deep, cinematic
-#    en-US-AndrewNeural   — US, warm, authoritative  ← default
-#    en-US-BrianNeural    — US, calm, documentary
-#    en-US-GuyNeural      — US, clear, neutral
+#  Bhakti Dhun requires Hindi female narration only. All pipeline entry points
+#  enforce this voice so scheduled jobs cannot silently switch to a male voice.
 # ─────────────────────────────────────────
-VOICE_ID    = "hi-IN-MadhurNeural"
+VOICE_ID    = "hi-IN-SwaraNeural"
 VOICE_RATE  = "-2%"     # natural devotional narration speed
 VOICE_PITCH = "+0Hz"    # keep the natural neural-voice pitch
 

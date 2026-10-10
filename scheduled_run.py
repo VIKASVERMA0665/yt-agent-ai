@@ -24,7 +24,7 @@ def main():
         with redirect_stdout(log), redirect_stderr(log):
             print(f"\n=== START {datetime.now().isoformat()} type={args.video_type} slot={args.slot} ===")
             try:
-                run(video_type=args.video_type, auto_upload=True, voice="hi-IN-MadhurNeural")
+                run(video_type=args.video_type, auto_upload=True, voice="hi-IN-SwaraNeural")
             except Exception:
                 traceback.print_exc()
                 raise

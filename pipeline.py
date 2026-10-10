@@ -38,8 +38,10 @@ def run(topic_override: str = "", voice: str = "", no_review: bool = False,
     config.IMAGES_DIR = os.path.join(run_dir, "images")
     Path(config.OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
     Path(config.IMAGES_DIR).mkdir(parents=True, exist_ok=True)
-    if voice:
-        config.VOICE_ID = voice
+    # This channel must never fall back to a male or non-Hindi voice.
+    config.VOICE_ID = "hi-IN-SwaraNeural"
+    if voice and voice != config.VOICE_ID:
+        print(f"  Voice override '{voice}' ignored; using Hindi female Swara only.")
 
     print(f"\n🎬 Bhakti Dhun AI · {video_type.upper()} pipeline")
     print("Output folder:", os.path.abspath(config.OUTPUT_DIR))
@@ -54,6 +56,7 @@ def run(topic_override: str = "", voice: str = "", no_review: bool = False,
     banner("2 / 6 · Writing Hindi script [Gemini]")
     script = write_script(research, video_type=video_type)
     script["video_type"] = video_type
+    script["topic"] = research.get("topic", research.get("video_title", topic_override))
     if not script.get("title"):
         script["title"] = research.get("video_title") or research.get("topic") or "Bhakti Dhun"
     script.setdefault("description", research.get("description", ""))

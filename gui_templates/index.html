@@ -344,18 +344,9 @@ input[type=range]{width:100%;accent-color:var(--primary)}
           </div>
 
           <div>
-            <div class="field-label">Voice<br><span style="font-size:10px;font-weight:400;color:var(--success,#4ade80)">✓ = word-synced captions</span></div>
+            <div class="field-label">Voice<br><span style="font-size:10px;font-weight:400;color:var(--success,#4ade80)">Hindi female only</span></div>
             <select id="quick-voice" onchange="applyQuickVoice(this.value)">
-              <option value="en-US-AndrewNeural">Andrew (US, Warm) ✓</option>
-              <option value="en-US-BrianNeural">Brian (US, Calm)</option>
-              <option value="en-GB-LibbyNeural">Libby (UK, Clear) ✓</option>
-              <option value="en-US-GuyNeural">Guy (US, Neutral)</option>
-              <option value="en-GB-RyanNeural">Ryan (UK, Warm)</option>
-              <option value="en-US-AriaNeural">Aria (US, Female)</option>
-              <option value="en-GB-SoniaNeural">Sonia (UK, Female)</option>
-              <option value="en-US-ChristopherNeural">Christopher (US, Deep)</option>
-              <option value="hi-IN-MadhurNeural">Madhur (Hindi, male — sentence-level captions)</option>
-              <option value="hi-IN-SwaraNeural">Swara (Hindi, female — sentence-level captions)</option>
+              <option value="hi-IN-SwaraNeural" selected>Swara (Hindi, female only)</option>
             </select>
           </div>
 
@@ -545,10 +536,10 @@ input[type=range]{width:100%;accent-color:var(--primary)}
               <input type="text" id="s-gemini" placeholder="Your Gemini API key">
             </div>
             <div class="settings-field">
-              <div class="field-label">Pexels API Key</div>
-              <input type="text" id="s-pexels" placeholder="Your Pexels API key">
+              <div class="field-label">Pixabay API Key</div>
+              <input type="text" id="s-pixabay" placeholder="Your Pixabay API key">
             </div>
-            <div class="help-text">Keys are saved to config.py. Get Gemini free at <strong>aistudio.google.com</strong>, Pexels at <strong>pexels.com/api</strong>.</div>
+            <div class="help-text">Keys are saved to config.py. Get Gemini at <strong>aistudio.google.com</strong> and Pixabay at <strong>pixabay.com/api/docs</strong>.</div>
           </div>
         </div>
 
@@ -575,23 +566,7 @@ input[type=range]{width:100%;accent-color:var(--primary)}
             <div class="settings-field">
               <div class="field-label">Voice</div>
               <select id="s-voice">
-                <optgroup label="✓ Word-synced captions (best quality)">
-                  <option value="en-US-AndrewNeural">Andrew (US, Warm male)</option>
-                  <option value="en-GB-LibbyNeural">Libby (UK, Clear female)</option>
-                </optgroup>
-                <optgroup label="Sentence-level captions (good quality)">
-                  <option value="en-US-BrianNeural">Brian (US, Calm male)</option>
-                  <option value="en-US-GuyNeural">Guy (US, Neutral male)</option>
-                  <option value="en-GB-RyanNeural">Ryan (UK, Warm male)</option>
-                  <option value="en-US-ChristopherNeural">Christopher (US, Deep male)</option>
-                  <option value="en-US-AriaNeural">Aria (US, Expressive female)</option>
-                  <option value="en-GB-SoniaNeural">Sonia (UK, Clear female)</option>
-                  <option value="en-AU-NatashaNeural">Natasha (AU, female)</option>
-                </optgroup>
-                <optgroup label="Hindi — sentence-level captions">
-                  <option value="hi-IN-MadhurNeural">Madhur (Hindi, male)</option>
-                  <option value="hi-IN-SwaraNeural">Swara (Hindi, female)</option>
-                </optgroup>
+                <option value="hi-IN-SwaraNeural" selected>Swara (Hindi, female only)</option>
               </select>
             </div>
             <div class="settings-cols">
@@ -1167,10 +1142,10 @@ function toggleSection(header) {
 function loadSettings() {
   fetch('/api/settings').then(r=>r.json()).then(d => {
     document.getElementById('s-gemini').value       = d.gemini_key  || '';
-    document.getElementById('s-pexels').value       = d.pexels_key  || '';
+    document.getElementById('s-pixabay').value      = d.pixabay_key || '';
     document.getElementById('s-channel-name').value = d.channel_name|| '';
     document.getElementById('s-channel-desc').value = d.channel_desc|| '';
-    document.getElementById('s-voice').value        = d.voice_id    || 'en-US-AndrewNeural';
+    document.getElementById('s-voice').value        = 'hi-IN-SwaraNeural';
     // Rate: sync hidden input, range slider, and display span
     const rate = d.voice_rate || '-5%';
     const rateNum = parseInt(rate) || -5;
@@ -1195,7 +1170,7 @@ function loadSettings() {
     document.getElementById('s-music-vol').value = mvol;
     document.getElementById('s-music-vol-val').textContent = mvol + '%';
     // Sync quick-voice dropdown
-    document.getElementById('quick-voice').value = d.voice_id || 'en-US-AndrewNeural';
+    document.getElementById('quick-voice').value = 'hi-IN-SwaraNeural';
     document.getElementById('quick-privacy').value = d.privacy || 'public';
     document.getElementById('upload-privacy').value = d.privacy || 'public';
 
@@ -1230,7 +1205,7 @@ function saveSettings() {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
       gemini_key:   document.getElementById('s-gemini').value,
-      pexels_key:   document.getElementById('s-pexels').value,
+      pixabay_key:  document.getElementById('s-pixabay').value,
       channel_name: document.getElementById('s-channel-name').value,
       channel_desc: document.getElementById('s-channel-desc').value,
       voice_id:     document.getElementById('s-voice').value,
